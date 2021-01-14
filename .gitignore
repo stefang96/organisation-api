@@ -1,7 +1,8 @@
-node_modules
-dist
-npm-debug.log
+# dependencies
+/node_modules
+/dist
+ 
+
+/.env
 
 .env
-
-data/
