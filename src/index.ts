@@ -5,10 +5,10 @@ import "reflect-metadata";
 import {createConnection} from "typeorm";
 import * as appConfig from "./config";
 import * as routes from './routes/routes';
- 
+
 dotenv.config();
 
- 
+
 const PORT = process.env.SERVER_PORT;
 
 const app:Application = express();
@@ -37,5 +37,6 @@ app.listen( PORT, () => {
 });
 
 createConnection(appConfig.dbOptions).then(async connection => {
+     
    console.log("Connected to DB");
 }).catch(error =>console.log("TypeORM connection error: ", error));

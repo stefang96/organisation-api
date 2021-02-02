@@ -10,10 +10,10 @@ export class Nodemailer{
             pass: "1677stef",
           },
         });
-    
+
         return transporter;
       }
-    
+
       /**
        * @param to - which user receives mail
        * @param subject - email subject
@@ -26,10 +26,10 @@ export class Nodemailer{
           subject,
           html: template,
         };
-    
+
         return email;
       }
-    
+
       /**
        * @param to - which user receives mail
        * @param subject - email subject
@@ -48,14 +48,22 @@ export class Nodemailer{
         });
       }
 
-        /**
-   * @param from - which user sends mail
-   * @param to - which user receives mail
-   */
-  static async sendInvitationEmail(from, to) {
+
+  static async inviteContactPerson( user) {
     const subject = "Welcome to Organisation";
-    const template = 'Thank you very much.';
-    await this.sendEmail(to, subject, template);
+    const template =` <div style=" margin-left:32%; width:185px;; height:50px;" >
+    <a   href='http://localhost:5000/auth/verify?verifytoken=` +
+encodeURIComponent(user.verifyToken) +
+`&email=` +
+encodeURIComponent(user.email) +
+`' >  <span > http://localhost:5000/auth/verify?verifytoken=` +
+encodeURIComponent(user.verifyToken) +
+`&email=` +
+encodeURIComponent(user.email) +
+`</span>
+    </a>
+ </div>`;
+    await this.sendEmail(user.email, subject, template);
   }
 
 }

@@ -1,16 +1,30 @@
 import { Nodemailer } from "../../utilities/email/nodemailer";
+import { MemberService } from "../members";
+import { OrganisationService } from "../organisation";
 
 export class AuthServices{
 
     static async register(body:any){
-        //validation user
 
-        const {firstName,lastName,email,phone} = body;
+      
+        const organisation ={
+            name:body.name,
+            numberOfEmployees:body.numberOfEmployees,
+            type:body.type,
+            address:body.address
+        }
+        const createdOrganisation = await OrganisationService.createPublicOrganisation(organisation)
+      
+        const contactPerson ={
+            email:body.email,
+            firstName:body.firstName,
+            lastName:body.lastName,
+            phone:body.phone
+        }
+        await MemberService.createContactPerson(contactPerson,createdOrganisation.id);
 
-        //check if email already exists
 
-      await Nodemailer.sendInvitationEmail('dddd','stefangrujicic996@gmail.com')
-           return 'Email send';
+        return 'Register success!';
     }
 
     static async login(body:any){

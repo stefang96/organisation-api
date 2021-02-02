@@ -1,14 +1,15 @@
-import {Entity, PrimaryGeneratedColumn, Column} from "typeorm";
+import {Entity, PrimaryGeneratedColumn, Column,ManyToOne} from "typeorm";
+import { Organisation } from "./organisation.model";
 
 export enum MembersRole {
     SUPER_ADMIN = "super_admin",
     ADMIN = "admin",
     MEMBER = "member",
-     
+
 }
 
 @Entity('member')
-export class User {
+export class Member {
 
     @PrimaryGeneratedColumn()
     id: number;
@@ -34,10 +35,15 @@ export class User {
     role: MembersRole;
 
 
-    @Column({ name: "Active", default: true })
+    @Column({ name: "Active", default: false })
     active: boolean;
+
+    @Column({name:"VerifyToken", nullable:true})
+    verifyToken: string;
 
     @Column({ name: "CreatedAt", nullable: true })
     createdAt: number;
 
+    @ManyToOne(() => Organisation, organisation => organisation.members)
+    organisation: Organisation;
 }
