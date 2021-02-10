@@ -48,7 +48,7 @@ export class AuthRoutes {
 
             } catch (error) {
                 return new ResponseBuilder<any>()
-                .setData(error)
+                .setData(error.message)
                 .setStatus(false)
                 .setResponse(res)
                 .setResponseStatus(400)
@@ -58,13 +58,37 @@ export class AuthRoutes {
 
         this.router.get("/verify", async (req: Request, res: Response) => {
             try {
-            //  const result = await MembershipUserService.verify(req, res);
+                console.log(req.params);
+                console.log(req.query);
+                const result = await AuthServices.verifyMember(req.query, res);
        
-               console.log(req.params);
-               console.log(req.query);
+               
             } catch (e) {
               return new ResponseBuilder<any>()
                 .setData(e)
+                .setStatus(false)
+                .setResponse(res)
+                .setResponseStatus(400);
+            }
+          });
+		  
+		  this.router.post("/set-password", async (req: Request, res: Response) => {
+            try {
+               
+				  console.log(req.body);
+                await AuthServices.setPassword(req.body);
+       
+               const result ="Success! Your Password has been set! <br/> <b>Please Log In!<b>"
+               return new ResponseBuilder<any>()
+               .setData(result)
+               .setStatus(true)
+               .setResponse(res)
+               .setResponseStatus(201)
+               .build();
+               
+            } catch (e) {
+              return new ResponseBuilder<any>()
+                .setData(e.message)
                 .setStatus(false)
                 .setResponse(res)
                 .setResponseStatus(400);

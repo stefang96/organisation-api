@@ -5,6 +5,7 @@ import "reflect-metadata";
 import {createConnection} from "typeorm";
 import * as appConfig from "./config";
 import * as routes from './routes/routes';
+import cors from 'cors';
 
 dotenv.config();
 
@@ -12,7 +13,9 @@ dotenv.config();
 const PORT = process.env.SERVER_PORT;
 
 const app:Application = express();
-
+app.use(cors({
+    origin:"*"
+}))
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 

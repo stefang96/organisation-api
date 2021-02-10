@@ -23,6 +23,9 @@ export class Member {
     @Column({name:"Email", nullable:false})
     email: string;
 
+    @Column({name:"Password", nullable:true})
+    password: string;
+
     @Column({name:"Phone", nullable:true})
     phone: string;
 
@@ -38,8 +41,14 @@ export class Member {
     @Column({ name: "Active", default: false })
     active: boolean;
 
+    @Column({ name: "Verified", default: false })
+    verified: boolean;
+
     @Column({name:"VerifyToken", nullable:true})
-    verifyToken: string;
+    verifytoken: string;
+
+    @Column({ name: "SetPasswordToken", nullable: true })
+    setpasswordtoken: string;
 
     @Column({ name: "CreatedAt", nullable: true })
     createdAt: number;

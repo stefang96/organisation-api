@@ -31,7 +31,7 @@ export class MemberService{
         const newMember = new Member();
 
         newMember.email=contactPerson.email;
-        newMember.verifyToken = await bcrypt.hash(contactPerson.email + MembersRole.ADMIN, saltRounds);
+        newMember.verifytoken = await bcrypt.hash(contactPerson.email + MembersRole.ADMIN, saltRounds);
         newMember.firstName=contactPerson.firstName;
         newMember.lastName=contactPerson.lastName;
         newMember.phone=contactPerson.phone;

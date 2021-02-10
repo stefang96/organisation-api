@@ -51,13 +51,13 @@ export class Nodemailer{
 
   static async inviteContactPerson( user) {
     const subject = "Welcome to Organisation";
-    const template =` <div style=" margin-left:32%; width:185px;; height:50px;" >
+    const template =` <div   >
     <a   href='http://localhost:5000/auth/verify?verifytoken=` +
-encodeURIComponent(user.verifyToken) +
+encodeURIComponent(user.verifytoken) +
 `&email=` +
 encodeURIComponent(user.email) +
 `' >  <span > http://localhost:5000/auth/verify?verifytoken=` +
-encodeURIComponent(user.verifyToken) +
+encodeURIComponent(user.verifytoken) +
 `&email=` +
 encodeURIComponent(user.email) +
 `</span>
