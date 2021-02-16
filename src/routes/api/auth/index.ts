@@ -12,7 +12,7 @@ export class AuthRoutes {
         this.router.post('/register',async (req:Request,res:Response)=>{
 
             try {
-                const result = await AuthServices.register(req.body);
+                const result = await AuthServices.register(req.body.data);
 
                 
                 return new ResponseBuilder<any>()
@@ -38,6 +38,9 @@ export class AuthRoutes {
 
             try {
                 const result = await AuthServices.login(req.body);
+
+                if (!result)
+                return res.status(400).json({ message: "Incorrect Credentials" });
 
                 return new ResponseBuilder<any>()
                 .setData(result)

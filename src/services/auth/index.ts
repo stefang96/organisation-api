@@ -30,7 +30,7 @@ export class AuthServices{
         await MemberService.createContactPerson(contactPerson,createdOrganisation.id);
 
 
-        return 'Register success!';
+        return 'Successfully Registered! <br/> Please check your email.';
     }
 
     static async login(body:any){
@@ -40,13 +40,13 @@ export class AuthServices{
        const member =await MemberRepository.getMemberByEmail(email);
       
        if(!member){
-           throw new Error('Invalid credentials!')
+          return
        }
 
        const match = await bcrypt.compare(password, member.password);
  
        if(!match) {
-            throw new Error('Invalid credentials!')
+           return
        }
  
        return await MemberHelper.setLoginResponse(member);
