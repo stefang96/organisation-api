@@ -56,16 +56,22 @@ export class NewsService {
 
   static async getNews(body: any, paginationValue = false) {
     console.log(body);
-
     const { pagination, filters } = body;
 
-    console.log(filters);
     let query = getManager()
       .getRepository(News)
       .createQueryBuilder("news")
       .leftJoinAndSelect("news.member", "member")
       .leftJoinAndSelect("member.organisation", "organisation")
       .where("news.active = :active", { active: true });
+
+    if (body.token) {
+      const loggedUser = jwt.decode(body.token);
+      query = query.andWhere("organisation.id = :organisationId", {
+        organisationId: loggedUser.organisation.id,
+      });
+      console.log(loggedUser);
+    }
 
     if (body.filters) {
       const { organisationId, search } = filters;
