@@ -1,5 +1,5 @@
 import { News } from "../../entities/news.model";
-import { getManager, getRepository } from "typeorm";
+import { getManager, getRepository, getConnection } from "typeorm";
 
 export class NewsRepository {
   static async createNews(news: News) {
@@ -21,5 +21,19 @@ export class NewsRepository {
 
   static async getAllNews(query: any) {
     return await query.getMany();
+  }
+
+  static async updateNews(body: News, newsId: number) {
+    const { title, description, shortDescription } = body;
+    return await getConnection()
+      .createQueryBuilder()
+      .update(News)
+      .set({
+        title: title,
+        shortDescription: shortDescription,
+        description: description,
+      })
+      .where("id = :id", { id: newsId })
+      .execute();
   }
 }

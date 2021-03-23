@@ -92,12 +92,13 @@ export class NewsService {
         });
       }
     }
-    // Pagination
-    const page = parseInt(pagination.page, 10) || 1;
-    const limit = 9;
-    const startIndex = (page - 1) * limit;
 
-    if (pagination) {
+    if (paginationValue) {
+      // Pagination
+      const page = parseInt(pagination.page, 10) || 1;
+      const limit = 9;
+      const startIndex = (page - 1) * limit;
+
       //with pagination
       return await NewsRepository.getNews(query, startIndex, limit);
     }
@@ -105,7 +106,13 @@ export class NewsService {
     return await NewsRepository.getAllNews(query);
   }
 
-  static async updateNews(body: any, newsId: number) {
-    // return await NewsRepository.createNews(news);
+  static async updateNews(body: News, newsId: number) {
+    await NewsRepository.updateNews(body, newsId);
+
+    return await this.getNewsById(newsId);
+  }
+
+  static async deleteNews(newsId: number) {
+    //
   }
 }

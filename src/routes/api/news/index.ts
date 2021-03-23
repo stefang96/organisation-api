@@ -4,10 +4,10 @@ import { AuthServices } from "../../../services/auth";
 import { NewsService } from "../../../services/news";
 import { ResponseBuilder } from "../../../utilities/response";
 import { getToken } from "../../../middleware/index";
+import { brotliDecompressSync } from "zlib";
 
 export class NewsRoutes {
   private router: Router = Router();
-  private folder = process.env.PUBLIC_FOLDER;
 
   public getRouter(): Router {
     this.router.post("/", getToken, async (req: any, res: any) => {
@@ -51,25 +51,41 @@ export class NewsRoutes {
       }
     });
 
-    this.router.put("/all", async (req: Request, res: Response) => {
+    this.router.put("/all", getToken, async (req: Request, res: Response) => {
       try {
-        const result = await NewsService.getNews(req.body, true);
-        const total = await NewsService.getNews(req.body);
-        const page = parseInt(req.body.pagination.page, 10) || 1;
-        const limit = 9;
+        let result = null;
+        let total = null;
+        let page = null;
+        let limit = null;
+        if (req.body.pagination) {
+          result = await NewsService.getNews(req.body, true);
+          total = await NewsService.getNews(req.body);
+          page = parseInt(req.body.pagination.page, 10) || 1;
+          limit = 9;
 
-        return new ResponseBuilder<any>()
-          .setData(result)
-          .setStatus(true)
-          .setMeta({
-            limit,
-            total: total.length,
-            offset: (page - 1) * limit,
-            page,
-          })
-          .setResponse(res)
-          .setResponseStatus(200)
-          .build();
+          return new ResponseBuilder<any>()
+            .setData(result)
+            .setStatus(true)
+            .setMeta({
+              limit,
+              total: total.length,
+              offset: (page - 1) * limit,
+              page,
+            })
+            .setResponse(res)
+            .setResponseStatus(200)
+            .build();
+        } else {
+          result = await NewsService.getNews(req.body);
+
+          return new ResponseBuilder<any>()
+            .setData(result)
+            .setStatus(true)
+
+            .setResponse(res)
+            .setResponseStatus(200)
+            .build();
+        }
       } catch (error) {
         return new ResponseBuilder<any>()
           .setData(error.message)
@@ -84,6 +100,27 @@ export class NewsRoutes {
       try {
         const newsId = req.params.newsId;
         const result = await NewsService.updateNews(req.body, Number(newsId));
+
+        return new ResponseBuilder<any>()
+          .setData(result)
+          .setStatus(true)
+          .setResponse(res)
+          .setResponseStatus(200)
+          .build();
+      } catch (error) {
+        return new ResponseBuilder<any>()
+          .setData(error.message)
+          .setStatus(false)
+          .setResponse(res)
+          .setResponseStatus(400)
+          .build();
+      }
+    });
+
+    this.router.delete("/:newsId", async (req: Request, res: Response) => {
+      try {
+        const newsId = req.params.newsId;
+        const result = await NewsService.deleteNews(Number(newsId));
 
         return new ResponseBuilder<any>()
           .setData(result)
