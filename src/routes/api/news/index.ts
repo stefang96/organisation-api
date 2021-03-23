@@ -53,12 +53,20 @@ export class NewsRoutes {
 
     this.router.put("/all", async (req: Request, res: Response) => {
       try {
-        console.log("all");
-        const result = await NewsService.getNews(req.body);
+        const result = await NewsService.getNews(req.body, true);
+        const total = await NewsService.getNews(req.body);
+        const page = parseInt(req.body.pagination.page, 10) || 1;
+        const limit = 9;
 
         return new ResponseBuilder<any>()
           .setData(result)
           .setStatus(true)
+          .setMeta({
+            limit,
+            total: total.length,
+            offset: (page - 1) * limit,
+            page,
+          })
           .setResponse(res)
           .setResponseStatus(200)
           .build();

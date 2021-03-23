@@ -9,15 +9,17 @@ export class NewsRepository {
     return await getManager()
       .getRepository(News)
       .createQueryBuilder("news")
+      .innerJoinAndSelect("news.member", "member")
+      .innerJoinAndSelect("member.organisation", "organisation")
       .where("news.id = :id", { id: newsId })
       .getOne();
   }
 
-  static async getNews() {
-    return await getManager()
-      .getRepository(News)
-      .createQueryBuilder("news")
-      .innerJoinAndSelect("news.member", "member")
-      .getMany();
+  static async getNews(query: any, startIndex, limit) {
+    return await query.skip(startIndex).take(limit).getMany();
+  }
+
+  static async getAllNews(query: any) {
+    return await query.getMany();
   }
 }

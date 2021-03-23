@@ -5,6 +5,7 @@ import {
   ManyToOne,
   OneToMany,
 } from "typeorm";
+import { Content } from "./abstract/content";
 import { News } from "./news.model";
 import { Organisation } from "./organisation.model";
 
@@ -15,10 +16,7 @@ export enum MembersRole {
 }
 
 @Entity("member")
-export class Member {
-  @PrimaryGeneratedColumn()
-  id: number;
-
+export class Member extends Content {
   @Column({ name: "FirstName", nullable: false })
   firstName: string;
 
@@ -42,9 +40,6 @@ export class Member {
   })
   role: MembersRole;
 
-  @Column({ name: "Active", default: false })
-  active: boolean;
-
   @Column({ name: "Verified", default: false })
   verified: boolean;
 
@@ -53,9 +48,6 @@ export class Member {
 
   @Column({ name: "SetPasswordToken", nullable: true })
   setpasswordtoken: string;
-
-  @Column({ name: "CreatedAt", nullable: true })
-  createdAt: number;
 
   @ManyToOne(() => Organisation, (organisation) => organisation.members)
   organisation: Organisation;

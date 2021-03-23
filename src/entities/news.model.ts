@@ -1,11 +1,9 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
+import { Content } from "./abstract/content";
 import { Member } from "./member.model";
 
 @Entity("news")
-export class News {
-  @PrimaryGeneratedColumn()
-  id: number;
-
+export class News extends Content {
   @Column({ name: "Title", nullable: false })
   title: string;
 
@@ -14,9 +12,6 @@ export class News {
 
   @Column({ name: "Description", nullable: true })
   description: string;
-
-  @Column({ name: "CreatedAt", nullable: true })
-  createdAt: number;
 
   @Column({ name: "FilePath", nullable: true })
   filePath: string;

@@ -1,127 +1,116 @@
 import { Response } from "express";
 
 export interface IJSONError {
-    code?: number;
-    help_url?: string;
-    message?: string;
+  code?: number;
+  help_url?: string;
+  message?: string;
 }
 
 export interface IJSONMetaResponse {
-    limit?: number;
-    offset?: number;
-    fields?: string;
-    sort?: string;
-    search?: string;
-    total?: number;
+  limit?: number;
+  offset?: number;
+  fields?: string;
+  sort?: string;
+  search?: string;
+  total?: number;
+  page?: number;
 }
 
 export interface IJSONBuilder<T> {
-    setData(data: T): this;
+  setData(data: T): this;
 
-    setStatus(status: boolean): this;
+  setStatus(status: boolean): this;
 
-    setMeta(...metaEntry: IJSONMetaResponse[]): this;
+  setMeta(...metaEntry: IJSONMetaResponse[]): this;
 
-    setError(errors: IJSONError[]): this;
+  setError(errors: IJSONError[]): this;
 
-    build(): Response;
+  build(): Response;
 
-    setResponse(response: Response): this;
+  setResponse(response: Response): this;
 
-    setResponseStatus(status: number): this;
+  setResponseStatus(status: number): this;
 }
 
 // tslint:disable
 export class JSONResponse<T> {
-    private status: boolean;
-    private result?: T;
-    private meta?: IJSONMetaResponse;
-    private errors?: IJSONError[];
+  private status: boolean;
+  private result?: T;
+  private meta?: IJSONMetaResponse;
+  private errors?: IJSONError[];
 
-    constructor() {
-
-        this.status = true;
-        this.meta = {};
-    }
+  constructor() {
+    this.status = true;
+    this.meta = {};
+  }
 }
 
 export class ResponseBuilder<T> implements IJSONBuilder<T> {
+  private responseObject: JSONResponse<T>;
+  private response: Response;
 
-    private responseObject: JSONResponse<T>;
-    private response: Response;
+  constructor() {
+    this.responseObject = new JSONResponse<T>();
+  }
 
-    constructor() {
+  public setData(data: T) {
+    Object.assign(this.responseObject, {
+      result: data,
+    });
 
-        this.responseObject = new JSONResponse<T>();
-    }
+    return this;
+  }
 
-    public setData(data: T) {
+  public setStatus(status: boolean) {
+    Object.assign(this.responseObject, {
+      status,
+    });
 
-        Object.assign(this.responseObject, {
-            result: data,
-        });
+    return this;
+  }
 
-        return this;
-    }
+  public setMeta(...metaEntry: IJSONMetaResponse[]) {
+    Object.assign(this.responseObject, {
+      meta: Object.assign({}, ...this.clearEntry(metaEntry)),
+    });
+    return this;
+  }
 
-    public setStatus(status: boolean) {
+  public setError(errors: IJSONError[]) {
+    Object.assign(this.responseObject, {
+      errors,
+    });
 
-        Object.assign(this.responseObject, {
-            status,
-        });
+    return this;
+  }
 
-        return this;
-    }
+  public setResponse(response: Response) {
+    this.response = response;
 
-    public setMeta(...metaEntry: IJSONMetaResponse[]) {
+    return this;
+  }
 
-        Object.assign(this.responseObject, {
-            meta: Object.assign({}, ...this.clearEntry(metaEntry)),
-        });
-        return this;
-    }
+  public setResponseStatus(status: number) {
+    this.response.status(status);
 
-    public setError(errors: IJSONError[]) {
+    return this;
+  }
 
-        Object.assign(this.responseObject, {
-            errors,
-        });
+  public build() {
+    return this.response.json(this.responseObject);
+  }
 
-        return this;
-    }
+  private clearEntry(metaData: IJSONMetaResponse[]) {
+    return metaData.map((meta) => {
+      for (const key in meta) {
+        if (typeof meta[key] === "undefined") {
+          delete meta[key];
+        }
+      }
 
-    public setResponse(response: Response) {
-
-        this.response = response;
-
-        return this;
-    }
-
-    public setResponseStatus(status: number) {
-
-        this.response.status(status);
-
-        return this;
-    }
-
-    public build() {
-
-        return this.response.json(this.responseObject);
-    }
-
-    private clearEntry(metaData: IJSONMetaResponse[]) {
-
-        return metaData.map((meta) => {
-
-            for (const key in meta) {
-                if (typeof meta[key] === "undefined") { 
-                    delete meta[key];
-                }
-            }
-
-            return meta;
-        });
-    }
+      return meta;
+    });
+  }
 }
 
 /* tslint:disable */
