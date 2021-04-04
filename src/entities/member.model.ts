@@ -40,6 +40,9 @@ export class Member extends Content {
   })
   role: MembersRole;
 
+  @Column({ name: "ContactPerson", default: false })
+  contactPerson: boolean;
+
   @Column({ name: "Verified", default: false })
   verified: boolean;
 

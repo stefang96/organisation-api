@@ -1,39 +1,18 @@
 import { Request, Response, Router } from "express";
-import { News } from "../../../entities/news.model";
-import { AuthServices } from "../../../services/auth";
-import { NewsService } from "../../../services/news";
+import { getToken } from "../../../middleware";
+import { OrganisationService } from "../../../services/organisation";
 import { ResponseBuilder } from "../../../utilities/response";
-import { getToken } from "../../../middleware/index";
-import { brotliDecompressSync } from "zlib";
 
-export class NewsRoutes {
+export class OrganisationRoutes {
   private router: Router = Router();
 
   public getRouter(): Router {
-    this.router.post("/", getToken, async (req: any, res: any) => {
+    this.router.get("/:organisationId", async (req: Request, res: Response) => {
       try {
-        const result = await NewsService.createNews(req.body, req.files);
-
-        return new ResponseBuilder<any>()
-          .setData(result)
-          .setStatus(true)
-          .setResponse(res)
-          .setResponseStatus(201)
-          .build();
-      } catch (error) {
-        return new ResponseBuilder<any>()
-          .setData(error.message)
-          .setStatus(false)
-          .setResponse(res)
-          .setResponseStatus(400)
-          .build();
-      }
-    });
-
-    this.router.get("/:newsId", async (req: Request, res: Response) => {
-      try {
-        const newsId = req.params.newsId;
-        const result = await NewsService.getNewsById(Number(newsId));
+        const newsId = req.params.organisationId;
+        const result = await OrganisationService.getOrganisationById(
+          Number(newsId)
+        );
 
         return new ResponseBuilder<any>()
           .setData(result)
@@ -59,8 +38,8 @@ export class NewsRoutes {
         let limit = null;
         console.log(req.body);
         if (req.body.pagination) {
-          result = await NewsService.getNews(req.body, true);
-          total = await NewsService.getNews(req.body);
+          result = await OrganisationService.getAllOrganisation(req.body, true);
+          total = await OrganisationService.getAllOrganisation(req.body);
           page = parseInt(req.body.pagination.page, 10) || 1;
           limit = 10;
 
@@ -77,12 +56,11 @@ export class NewsRoutes {
             .setResponseStatus(200)
             .build();
         } else {
-          result = await NewsService.getNews(req.body);
+          result = await OrganisationService.getAllOrganisation(req.body);
 
           return new ResponseBuilder<any>()
             .setData(result)
             .setStatus(true)
-
             .setResponse(res)
             .setResponseStatus(200)
             .build();
@@ -97,10 +75,13 @@ export class NewsRoutes {
       }
     });
 
-    this.router.put("/:newsId", async (req: Request, res: Response) => {
+    this.router.put("/:organisationId", async (req: Request, res: Response) => {
       try {
-        const newsId = req.params.newsId;
-        const result = await NewsService.updateNews(req.body, Number(newsId));
+        const organisationId = req.params.newsId;
+        const result = await OrganisationService.updateOrganisation(
+          req.body,
+          Number(organisationId)
+        );
 
         return new ResponseBuilder<any>()
           .setData(result)
@@ -118,26 +99,31 @@ export class NewsRoutes {
       }
     });
 
-    this.router.delete("/:newsId", async (req: Request, res: Response) => {
-      try {
-        const newsId = req.params.newsId;
-        const result = await NewsService.deleteNews(Number(newsId));
+    this.router.delete(
+      "/:organisationId",
+      async (req: Request, res: Response) => {
+        try {
+          const organisationId = req.params.organisationId;
+          const result = await OrganisationService.deleteOrganisation(
+            Number(organisationId)
+          );
 
-        return new ResponseBuilder<any>()
-          .setData(result)
-          .setStatus(true)
-          .setResponse(res)
-          .setResponseStatus(200)
-          .build();
-      } catch (error) {
-        return new ResponseBuilder<any>()
-          .setData(error.message)
-          .setStatus(false)
-          .setResponse(res)
-          .setResponseStatus(400)
-          .build();
+          return new ResponseBuilder<any>()
+            .setData(result)
+            .setStatus(true)
+            .setResponse(res)
+            .setResponseStatus(200)
+            .build();
+        } catch (error) {
+          return new ResponseBuilder<any>()
+            .setData(error.message)
+            .setStatus(false)
+            .setResponse(res)
+            .setResponseStatus(400)
+            .build();
+        }
       }
-    });
+    );
 
     return this.router;
   }

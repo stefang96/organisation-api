@@ -3,13 +3,24 @@ import { Member } from "../../entities/member.model";
 import { Organisation } from "../../entities/organisation.model";
 
 export class OrganisationRepository {
+  static async createOrganisation(organisation: Organisation) {
+    return await getManager().getRepository(Organisation).save(organisation);
+  }
 
-    static async createOrganisation(organisation:Organisation){
-      
-        return await getManager().getRepository(Organisation).save(organisation)
+  static async getOrganisationById(organisationId: number) {
+    return await getManager()
+      .getRepository(Organisation)
+      .createQueryBuilder("organisation")
+      .innerJoinAndSelect("organisation.members", "members")
+      .where("organisation.id = :id", { id: organisationId })
+      .getOne();
+  }
 
-    }
+  static async getAllOrganisations(query: any) {
+    return await query.getMany();
+  }
 
-
-
+  static async getOrganisations(query: any, startIndex, limit) {
+    return await query.skip(startIndex).take(limit).getMany();
+  }
 }

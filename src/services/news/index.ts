@@ -86,7 +86,7 @@ export class NewsService {
                 firstName: "%" + search + "%",
               })
               .orWhere("LOWER(member.lastName)  like LOWER(:lastName)", {
-                country: "%" + search + "%",
+                lastName: "%" + search + "%",
               });
           })
         );
@@ -102,7 +102,7 @@ export class NewsService {
     if (paginationValue) {
       // Pagination
       const page = parseInt(pagination.page, 10) || 1;
-      const limit = 9;
+      const limit = 10;
       const startIndex = (page - 1) * limit;
 
       //with pagination

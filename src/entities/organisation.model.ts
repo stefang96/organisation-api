@@ -1,33 +1,21 @@
-import {Entity, PrimaryGeneratedColumn, Column,OneToMany} from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
+import { Content } from "./abstract/content";
 import { Member } from "./member.model";
 
-@Entity('organisation')
-export class Organisation {
+@Entity("organisation")
+export class Organisation extends Content {
+  @Column({ name: "Name", nullable: false })
+  name: string;
 
-    @PrimaryGeneratedColumn()
-    id: number;
+  @Column({ name: "Address", nullable: true })
+  address: string;
 
-    @Column({name:"Name",nullable:false})
-    name: string;
+  @Column({ name: "Type", nullable: false })
+  type: string;
 
-    @Column({name:"Address",nullable:true})
-    address: string;
+  @Column({ name: "NumberOfEmployees", nullable: true })
+  numberOfEmployees: number;
 
-    @Column({name:"Type",nullable:false})
-    type: string;
-
-    @Column({name:"NumberOfEmployees",nullable:true})
-    numberOfEmployees: number;
-
-    @Column({ name: "Active", default: true })
-    active: boolean;
-
-    @Column({ name: "CreatedAt", nullable: true })
-    createdAt: number;
-
-    @OneToMany(() => Member, member => member.organisation)
-    members: Member[];
-
-
-
+  @OneToMany(() => Member, (member) => member.organisation)
+  members: Member[];
 }
