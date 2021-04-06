@@ -41,7 +41,7 @@ export class OrganisationRoutes {
           result = await OrganisationService.getAllOrganisation(req.body, true);
           total = await OrganisationService.getAllOrganisation(req.body);
           page = parseInt(req.body.pagination.page, 10) || 1;
-          limit = 10;
+          limit = 1;
 
           return new ResponseBuilder<any>()
             .setData(result)

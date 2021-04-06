@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToOne,
+  OneToMany,
+  JoinColumn,
+} from "typeorm";
 import { Content } from "./abstract/content";
 import { Member } from "./member.model";
 
@@ -15,6 +22,10 @@ export class Organisation extends Content {
 
   @Column({ name: "NumberOfEmployees", nullable: true })
   numberOfEmployees: number;
+
+  @OneToOne(() => Member)
+  @JoinColumn()
+  contactPerson: Member;
 
   @OneToMany(() => Member, (member) => member.organisation)
   members: Member[];

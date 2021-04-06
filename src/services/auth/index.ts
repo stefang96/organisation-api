@@ -6,11 +6,12 @@ import { OrganisationService } from "../organisation";
 import * as bcrypt from "bcrypt";
 import { MemberHelper } from "../../utilities/member";
 import { MemberValidation } from "../../utilities/member/validation";
+import { OrganisationRepository } from "../../repositories/organisation";
+import { object } from "joi";
 
 const saltRounds = 10;
 export class AuthServices {
-  static async register(body: any) {
-    console.log(body);
+  static async signup(body: any) {
     const organisation = {
       name: body.name,
       numberOfEmployees: body.numberOfEmployees,
@@ -27,12 +28,16 @@ export class AuthServices {
       lastName: body.lastName,
       phone: body.phone,
     };
-    await MemberService.createContactPerson(
+    const createdContactPerson = await MemberService.createContactPerson(
       contactPerson,
       createdOrganisation.id
     );
 
-    return "Successfully Registered! <br/> Please check your email.";
+    createdOrganisation.contactPerson = createdContactPerson;
+
+    await OrganisationRepository.createOrganisation(createdOrganisation);
+
+    return "Successfully signup! <br/> Please check your email.";
   }
 
   static async login(body: any) {

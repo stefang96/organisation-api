@@ -3,6 +3,7 @@ import { OrganisationRepository } from "../../repositories/organisation";
 import { OrganisationValidation } from "../../utilities/organisation/validation";
 import { getManager, Brackets } from "typeorm";
 import jwt from "jsonwebtoken";
+import moment = require("moment");
 
 export class OrganisationService {
   static async createPublicOrganisation(organisation: any) {
@@ -21,7 +22,8 @@ export class OrganisationService {
     newOrganisation.numberOfEmployees = organisation.numberOfEmployees;
     newOrganisation.type = organisation.type;
     newOrganisation.address = organisation.address;
-    newOrganisation.active = false;
+    newOrganisation.active = true;
+    newOrganisation.createdAt = moment().unix();
 
     return await OrganisationRepository.createOrganisation(newOrganisation);
   }
@@ -38,6 +40,7 @@ export class OrganisationService {
       .getRepository(Organisation)
       .createQueryBuilder("organisation")
       .leftJoinAndSelect("organisation.members", "member")
+      .leftJoinAndSelect("organisation.contactPerson", "contactPerson")
       .where("organisation.active = :active", { active: true });
 
     if (body.token) {
@@ -68,7 +71,7 @@ export class OrganisationService {
     if (paginationValue) {
       // Pagination
       const page = parseInt(pagination.page, 10) || 1;
-      const limit = 10;
+      const limit = 1;
       const startIndex = (page - 1) * limit;
 
       //with pagination

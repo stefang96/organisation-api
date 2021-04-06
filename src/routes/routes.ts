@@ -1,7 +1,9 @@
 import * as express from "express";
 import expressJwt from "express-jwt";
+import { OrganisationValidation } from "../utilities/organisation/validation";
 import { AuthRoutes } from "./api/auth";
 import { NewsRoutes } from "./api/news";
+import { OrganisationRoutes } from "./api/organisation";
 
 export async function apiRoutes(app: express.Application) {
   app.use((req, res, next) => {
@@ -27,8 +29,9 @@ export async function apiRoutes(app: express.Application) {
         "/api/auth",
         "/api/auth/verify",
         "/api/auth/login",
-        "/api/auth/register",
+        "/api/auth/signup",
         { url: /^\/api\/news\/.*/, methods: ["GET", "PUT"] },
+        { url: /^\/api\/organisation\/.*/, methods: ["GET", "PUT"] },
       ],
     })
   );
@@ -41,4 +44,5 @@ export async function apiRoutes(app: express.Application) {
 
   app.use("/api/auth", new AuthRoutes().getRouter());
   app.use("/api/news", new NewsRoutes().getRouter());
+  app.use("/api/organisation", new OrganisationRoutes().getRouter());
 }

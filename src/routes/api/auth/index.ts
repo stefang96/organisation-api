@@ -1,4 +1,5 @@
 import { Request, Response, Router } from "express";
+import { checkMemberEmail } from "../../../middleware";
 import { AuthServices } from "../../../services/auth";
 import { ResponseBuilder } from "../../../utilities/response";
 
@@ -6,25 +7,30 @@ export class AuthRoutes {
   private router: Router = Router();
 
   public getRouter(): Router {
-    this.router.post("/register", async (req: Request, res: Response) => {
-      try {
-        const result = await AuthServices.register(req.body);
+    this.router.post(
+      "/signup",
+      checkMemberEmail,
+      async (req: Request, res: Response) => {
+        try {
+          console.log(req.body);
+          const result = await AuthServices.signup(req.body);
 
-        return new ResponseBuilder<any>()
-          .setData(result)
-          .setStatus(true)
-          .setResponse(res)
-          .setResponseStatus(201)
-          .build();
-      } catch (error) {
-        return new ResponseBuilder<any>()
-          .setData(error.message)
-          .setStatus(false)
-          .setResponse(res)
-          .setResponseStatus(400)
-          .build();
+          return new ResponseBuilder<any>()
+            .setData(result)
+            .setStatus(true)
+            .setResponse(res)
+            .setResponseStatus(201)
+            .build();
+        } catch (error) {
+          return new ResponseBuilder<any>()
+            .setData(error.message)
+            .setStatus(false)
+            .setResponse(res)
+            .setResponseStatus(400)
+            .build();
+        }
       }
-    });
+    );
 
     this.router.post("/login", async (req: Request, res: Response) => {
       try {
