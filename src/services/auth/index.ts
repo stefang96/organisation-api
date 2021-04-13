@@ -8,6 +8,8 @@ import { MemberHelper } from "../../utilities/member";
 import { MemberValidation } from "../../utilities/member/validation";
 import { OrganisationRepository } from "../../repositories/organisation";
 import { object } from "joi";
+import { Nodemailer } from "../../utilities/email/nodemailer";
+import crypto from "crypto";
 
 const saltRounds = 10;
 export class AuthServices {
@@ -108,5 +110,23 @@ export class AuthServices {
     member.password = hashPassword;
 
     await MemberRepository.saveMember(member);
+  }
+
+  static async resetPassword(body: any) {
+    const { email } = body;
+
+    const member = await MemberRepository.getMemberByEmail(email);
+
+    const salt = await bcrypt.genSalt(10);
+    const plainText = crypto.randomBytes(6).toString("hex");
+    const hashPassword = await bcrypt.hash(plainText, salt);
+
+    member.password = hashPassword;
+
+    await Nodemailer.resetPassword(plainText, email);
+
+    await MemberRepository.saveMember(member);
+
+    return;
   }
 }

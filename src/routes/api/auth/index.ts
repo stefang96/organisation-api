@@ -91,6 +91,25 @@ export class AuthRoutes {
       }
     });
 
+    this.router.put("/reset-password", async (req: Request, res: Response) => {
+      try {
+        await AuthServices.resetPassword(req.body);
+
+        return new ResponseBuilder<any>()
+          .setData("Success!")
+          .setStatus(true)
+          .setResponse(res)
+          .setResponseStatus(201)
+          .build();
+      } catch (e) {
+        return new ResponseBuilder<any>()
+          .setData(e.message)
+          .setStatus(false)
+          .setResponse(res)
+          .setResponseStatus(400);
+      }
+    });
+
     return this.router;
   }
 }
