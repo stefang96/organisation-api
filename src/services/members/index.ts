@@ -45,4 +45,9 @@ export class MemberService {
     await Nodemailer.inviteContactPerson(newMember);
     return await MemberRepository.saveContactPerson(newMember);
   }
+
+  static async sendEmailToContactPerson(body: any, memberId) {
+    const member = await MemberRepository.getMemberById(memberId);
+    await Nodemailer.sendEmailToContactPerson(body, member.email);
+  }
 }

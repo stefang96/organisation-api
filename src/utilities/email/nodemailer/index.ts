@@ -73,4 +73,17 @@ export class Nodemailer {
  </div>`;
     await this.sendEmail(email, subject, template);
   }
+
+  static async sendEmailToContactPerson(data, to) {
+    console.log(data);
+    const subject = "Add user";
+    const template = ` <div   >
+  Please add me into your organisation <br> <hr>
+    First name : ${data.firstName}   <br>
+    Last name : ${data.lastName}   <br>
+    Email : ${data.email}   <br>
+    ${data.message ? `Message: ` + data.message : ""} <br> <hr>
+ </div>`;
+    await this.sendEmail(to, subject, template);
+  }
 }

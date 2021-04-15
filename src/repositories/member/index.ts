@@ -36,4 +36,8 @@ export class MemberRepository {
       .getRepository(Member)
       .findOne({ email: email, setpasswordtoken: setpasswordtoken });
   }
+
+  static async getMemberById(memberId: number) {
+    return await getManager().getRepository(Member).findOne({ id: memberId });
+  }
 }
