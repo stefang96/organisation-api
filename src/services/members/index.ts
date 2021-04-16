@@ -50,4 +50,8 @@ export class MemberService {
     const member = await MemberRepository.getMemberById(memberId);
     await Nodemailer.sendEmailToContactPerson(body, member.email);
   }
+
+  static async getMemberById(memberId: number) {
+    return await MemberRepository.getMemberById(memberId);
+  }
 }

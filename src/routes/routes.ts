@@ -41,6 +41,7 @@ export async function apiRoutes(app: express.Application) {
   );
 
   app.use((err, req, res, next) => {
+    console.log(req.headers);
     if (err.name === "UnauthorizedError") {
       res.status(401).json({ message: "Invalid token." });
     }

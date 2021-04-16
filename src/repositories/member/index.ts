@@ -38,6 +38,18 @@ export class MemberRepository {
   }
 
   static async getMemberById(memberId: number) {
-    return await getManager().getRepository(Member).findOne({ id: memberId });
+    return await getManager()
+      .getRepository(Member)
+      .findOne(
+        { id: memberId },
+        {
+          relations: [
+            "organisation",
+            "news",
+            "news.member",
+            "news.member.organisation",
+          ],
+        }
+      );
   }
 }

@@ -4,6 +4,7 @@ import moment = require("moment");
 import jwt from "jsonwebtoken";
 import fs from "fs";
 import { getManager, Brackets } from "typeorm";
+import { getToken } from "../../middleware";
 
 export class NewsService {
   private static public = process.env.PUBLIC_FOLDER;
@@ -56,7 +57,7 @@ export class NewsService {
 
   static async getNews(body: any, paginationValue = false) {
     console.log(body);
-    const { pagination, filters } = body;
+    const { pagination, filters, memberId } = body;
 
     let query = getManager()
       .getRepository(News)
@@ -67,10 +68,19 @@ export class NewsService {
 
     if (body.token) {
       const loggedUser = jwt.decode(body.token);
-      query = query.andWhere("organisation.id = :organisationId", {
-        organisationId: loggedUser.organisation.id,
-      });
+      if (loggedUser.role !== "super_admin") {
+        query = query.andWhere("organisation.id = :organisationId", {
+          organisationId: loggedUser.organisation.id,
+        });
+      }
+
       console.log(loggedUser);
+    }
+
+    if (body.memberId) {
+      query = query.andWhere("member.id = :memberId", {
+        memberId: memberId,
+      });
     }
 
     if (body.filters) {

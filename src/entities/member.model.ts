@@ -53,5 +53,5 @@ export class Member extends Content {
   organisation: Organisation;
 
   @OneToMany(() => News, (news) => news.member)
-  news: News;
+  news: News[];
 }
