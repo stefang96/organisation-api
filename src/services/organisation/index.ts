@@ -71,7 +71,7 @@ export class OrganisationService {
     if (paginationValue) {
       // Pagination
       const page = parseInt(pagination.page, 10) || 1;
-      const limit = 1;
+      const limit = 10;
       const startIndex = (page - 1) * limit;
 
       //with pagination

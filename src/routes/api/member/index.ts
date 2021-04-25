@@ -60,6 +60,51 @@ export class MemberRoutes {
           .build();
       }
     });
+
+    this.router.get("/", getToken, async (req: any, res: any) => {
+      try {
+        let result = null;
+        let total = null;
+        let page = null;
+        let limit = null;
+        console.log(req.body);
+        if (req.body.pagination) {
+          result = await MemberService.getAllMembers(req.body, true);
+          total = await MemberService.getAllMembers(req.body);
+          page = parseInt(req.body.pagination.page, 10) || 1;
+          limit = 1;
+
+          return new ResponseBuilder<any>()
+            .setData(result)
+            .setStatus(true)
+            .setMeta({
+              limit,
+              total: total.length,
+              offset: (page - 1) * limit,
+              page,
+            })
+            .setResponse(res)
+            .setResponseStatus(200)
+            .build();
+        } else {
+          result = await MemberService.getAllMembers(req.body);
+
+          return new ResponseBuilder<any>()
+            .setData(result)
+            .setStatus(true)
+            .setResponse(res)
+            .setResponseStatus(200)
+            .build();
+        }
+      } catch (error) {
+        return new ResponseBuilder<any>()
+          .setData(error.message)
+          .setStatus(false)
+          .setResponse(res)
+          .setResponseStatus(400)
+          .build();
+      }
+    });
     return this.router;
   }
 }

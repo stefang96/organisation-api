@@ -2,7 +2,7 @@ import { News } from "../../entities/news.model";
 import { getManager, getRepository, getConnection } from "typeorm";
 
 export class NewsRepository {
-  static async createNews(news: News) {
+  static async saveNews(news: News) {
     return await getManager().getRepository(News).save(news);
   }
   static async getNewsById(newsId: number) {
@@ -16,7 +16,11 @@ export class NewsRepository {
   }
 
   static async getNews(query: any, startIndex, limit) {
-    return await query.skip(startIndex).take(limit).getMany();
+    return await query
+      .skip(startIndex)
+      .take(limit)
+      .orderBy("news.createdAt", "DESC")
+      .getMany();
   }
 
   static async getAllNews(query: any) {
@@ -33,6 +37,15 @@ export class NewsRepository {
         shortDescription: shortDescription,
         description: description,
       })
+      .where("id = :id", { id: newsId })
+      .execute();
+  }
+
+  static async deleteNews(newsId: number) {
+    return await getConnection()
+      .createQueryBuilder()
+      .delete()
+      .from(News)
       .where("id = :id", { id: newsId })
       .execute();
   }

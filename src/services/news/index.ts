@@ -23,12 +23,8 @@ export class NewsService {
     news.createdAt = moment().unix();
     news.active = true;
 
-    let fileNews = files.file;
-    if (files.file.length > 1) {
-      fileNews = files.file[0];
-    }
+    const createdNews = await NewsRepository.saveNews(news);
 
-    const createdNews = await NewsRepository.createNews(news);
     const filePath = `${this.public}/news_${createdNews.id}`;
 
     fs.mkdir(filePath, (err) => {
@@ -38,17 +34,24 @@ export class NewsService {
       console.log("Directory created successfully!");
     });
 
-    fileNews.mv(`${filePath}/${fileNews.name}`, (res, err) => {
-      if (err) {
-        console.log(err);
-        throw new Error("Error occured");
+    if (files) {
+      let fileNews = files.file;
+      if (files.file.length > 1) {
+        fileNews = files.file[0];
       }
-    });
 
-    createdNews.fileName = fileNews.name;
-    createdNews.filePath = `http://localhost:${this.port}/static/news_${createdNews.id}/${fileNews.name}`;
+      fileNews.mv(`${filePath}/${fileNews.name}`, (res, err) => {
+        if (err) {
+          console.log(err);
+          throw new Error("Error occured");
+        }
+      });
 
-    return await NewsRepository.createNews(createdNews);
+      createdNews.fileName = fileNews.name;
+      createdNews.filePath = `http://localhost:${this.port}/static/news_${createdNews.id}/${fileNews.name}`;
+    }
+
+    return await NewsRepository.saveNews(createdNews);
   }
 
   static async getNewsById(newsId: number) {
@@ -56,7 +59,6 @@ export class NewsService {
   }
 
   static async getNews(body: any, paginationValue = false) {
-    console.log(body);
     const { pagination, filters, memberId } = body;
 
     let query = getManager()
@@ -73,8 +75,6 @@ export class NewsService {
           organisationId: loggedUser.organisation.id,
         });
       }
-
-      console.log(loggedUser);
     }
 
     if (body.memberId) {
@@ -112,7 +112,7 @@ export class NewsService {
     if (paginationValue) {
       // Pagination
       const page = parseInt(pagination.page, 10) || 1;
-      const limit = 10;
+      const limit = 9;
       const startIndex = (page - 1) * limit;
 
       //with pagination
@@ -122,13 +122,35 @@ export class NewsService {
     return await NewsRepository.getAllNews(query);
   }
 
-  static async updateNews(body: News, newsId: number) {
+  static async updateNews(body: News, newsId: number, files: any) {
+    console.log(body);
+    console.log(files);
     await NewsRepository.updateNews(body, newsId);
+    const news = await this.getNewsById(newsId);
+    console.log(news);
+    if (files) {
+      let fileNews = files.file;
+      if (files.file.length > 1) {
+        fileNews = files.file[0];
+      }
 
-    return await this.getNewsById(newsId);
+      const filePath = `${this.public}/news_${news.id}`;
+
+      fileNews.mv(`${filePath}/${fileNews.name}`, (res, err) => {
+        if (err) {
+          console.log(err);
+          throw new Error("Error occured");
+        }
+      });
+
+      news.fileName = fileNews.name;
+      news.filePath = `http://localhost:${this.port}/static/news_${news.id}/${fileNews.name}`;
+    }
+
+    return await NewsRepository.saveNews(news);
   }
 
   static async deleteNews(newsId: number) {
-    //
+    return await NewsRepository.deleteNews(newsId);
   }
 }

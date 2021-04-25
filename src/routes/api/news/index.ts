@@ -4,7 +4,6 @@ import { AuthServices } from "../../../services/auth";
 import { NewsService } from "../../../services/news";
 import { ResponseBuilder } from "../../../utilities/response";
 import { getToken } from "../../../middleware/index";
-import { brotliDecompressSync } from "zlib";
 
 export class NewsRoutes {
   private router: Router = Router();
@@ -12,6 +11,10 @@ export class NewsRoutes {
   public getRouter(): Router {
     this.router.post("/", getToken, async (req: any, res: any) => {
       try {
+        console.log(req.body);
+
+        console.log(req.files);
+
         const result = await NewsService.createNews(req.body, req.files);
 
         return new ResponseBuilder<any>()
@@ -57,12 +60,12 @@ export class NewsRoutes {
         let total = null;
         let page = null;
         let limit = null;
-        console.log(req.body);
+
         if (req.body.pagination) {
           result = await NewsService.getNews(req.body, true);
           total = await NewsService.getNews(req.body);
           page = parseInt(req.body.pagination.page, 10) || 1;
-          limit = 10;
+          limit = 9;
 
           return new ResponseBuilder<any>()
             .setData(result)
@@ -97,10 +100,14 @@ export class NewsRoutes {
       }
     });
 
-    this.router.put("/:newsId", async (req: Request, res: Response) => {
+    this.router.put("/:newsId", async (req: any, res: any) => {
       try {
         const newsId = req.params.newsId;
-        const result = await NewsService.updateNews(req.body, Number(newsId));
+        const result = await NewsService.updateNews(
+          req.body,
+          Number(newsId),
+          req.files
+        );
 
         return new ResponseBuilder<any>()
           .setData(result)

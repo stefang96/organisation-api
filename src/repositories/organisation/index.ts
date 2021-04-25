@@ -21,6 +21,10 @@ export class OrganisationRepository {
   }
 
   static async getOrganisations(query: any, startIndex, limit) {
-    return await query.skip(startIndex).take(limit).getMany();
+    return await query
+      .skip(startIndex)
+      .take(limit)
+      .orderBy("organisation.createdAt", "DESC")
+      .getMany();
   }
 }

@@ -52,4 +52,16 @@ export class MemberRepository {
         }
       );
   }
+
+  static async getAllMembers(query: any) {
+    return await query.getMany();
+  }
+
+  static async getMembers(query: any, startIndex, limit) {
+    return await query
+      .skip(startIndex)
+      .take(limit)
+      .orderBy("member.createdAt", "DESC")
+      .getMany();
+  }
 }
