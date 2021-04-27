@@ -1,11 +1,7 @@
-import { getManager, getRepository } from "typeorm";
+import { getManager, getRepository, getConnection } from "typeorm";
 import { Member } from "../../entities/member.model";
 
 export class MemberRepository {
-  static async saveContactPerson(contactPerson: any) {
-    return await getManager().getRepository(Member).save(contactPerson);
-  }
-
   static async saveMember(member: any) {
     return await getManager().getRepository(Member).save(member);
   }
@@ -61,7 +57,16 @@ export class MemberRepository {
     return await query
       .skip(startIndex)
       .take(limit)
-      .orderBy("member.createdAt", "DESC")
+      .orderBy("member.id", "ASC")
       .getMany();
+  }
+
+  static async deleteMember(memberId: number) {
+    return await getConnection()
+      .createQueryBuilder()
+      .delete()
+      .from(Member)
+      .where("id = :id", { id: memberId })
+      .execute();
   }
 }

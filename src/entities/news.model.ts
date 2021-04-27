@@ -19,6 +19,6 @@ export class News extends Content {
   @Column({ name: "FileName", nullable: true })
   fileName: string;
 
-  @ManyToOne(() => Member, (member) => member.news)
+  @ManyToOne(() => Member, (member) => member.news, { onDelete: "CASCADE" })
   member: Member;
 }

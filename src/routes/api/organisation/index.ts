@@ -9,9 +9,9 @@ export class OrganisationRoutes {
   public getRouter(): Router {
     this.router.get("/:organisationId", async (req: Request, res: Response) => {
       try {
-        const newsId = req.params.organisationId;
+        const organisationId = req.params.organisationId;
         const result = await OrganisationService.getOrganisationById(
-          Number(newsId)
+          Number(organisationId)
         );
 
         return new ResponseBuilder<any>()
@@ -75,9 +75,29 @@ export class OrganisationRoutes {
       }
     });
 
+    this.router.post("/", getToken, async (req: any, res: any) => {
+      try {
+        const result = await OrganisationService.createOrganisation(req.body);
+
+        return new ResponseBuilder<any>()
+          .setData(result)
+          .setStatus(true)
+          .setResponse(res)
+          .setResponseStatus(200)
+          .build();
+      } catch (error) {
+        return new ResponseBuilder<any>()
+          .setData(error.message)
+          .setStatus(false)
+          .setResponse(res)
+          .setResponseStatus(400)
+          .build();
+      }
+    });
+
     this.router.put("/:organisationId", async (req: Request, res: Response) => {
       try {
-        const organisationId = req.params.newsId;
+        const organisationId = req.params.organisationId;
         const result = await OrganisationService.updateOrganisation(
           req.body,
           Number(organisationId)

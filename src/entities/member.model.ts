@@ -49,7 +49,9 @@ export class Member extends Content {
   @Column({ name: "SetPasswordToken", nullable: true })
   setpasswordtoken: string;
 
-  @ManyToOne(() => Organisation, (organisation) => organisation.members)
+  @ManyToOne(() => Organisation, (organisation) => organisation.members, {
+    onDelete: "CASCADE",
+  })
   organisation: Organisation;
 
   @OneToMany(() => News, (news) => news.member)

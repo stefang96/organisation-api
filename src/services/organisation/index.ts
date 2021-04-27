@@ -9,7 +9,7 @@ export class OrganisationService {
   static async createPublicOrganisation(organisation: any) {
     // Organisation validaton
 
-    const isValid = await OrganisationValidation.validateOragnisaion(
+    const isValid = await OrganisationValidation.validateOragnisation(
       organisation
     );
 
@@ -25,7 +25,7 @@ export class OrganisationService {
     newOrganisation.active = true;
     newOrganisation.createdAt = moment().unix();
 
-    return await OrganisationRepository.createOrganisation(newOrganisation);
+    return await OrganisationRepository.saveOrganisation(newOrganisation);
   }
 
   static async getOrganisationById(organisationId: number) {
@@ -86,10 +86,37 @@ export class OrganisationService {
   }
 
   static async updateOrganisation(body: Organisation, organisationdId: number) {
-    //
+    const organisation = await this.getOrganisationById(organisationdId);
+    const { name, numberOfEmployees, type, address, contactPerson } = body;
+
+    organisation.name = name;
+    organisation.numberOfEmployees = numberOfEmployees;
+    organisation.type = type;
+    organisation.address = address;
+    organisation.contactPerson = contactPerson as any;
+
+    return await OrganisationRepository.saveOrganisation(organisation);
   }
 
   static async deleteOrganisation(organisationdId: number) {
-    //
+    return await OrganisationRepository.deleteOrganisation(organisationdId);
+  }
+
+  static async createOrganisation(body: any) {
+    const isValid = await OrganisationValidation.validateOragnisation(body);
+
+    if (!isValid) {
+      throw new Error("Validation error!");
+    }
+
+    const newOrganisation = new Organisation();
+    newOrganisation.name = body.name;
+    newOrganisation.numberOfEmployees = body.numberOfEmployees;
+    newOrganisation.type = body.type;
+    newOrganisation.address = body.address;
+    newOrganisation.active = true;
+    newOrganisation.createdAt = moment().unix();
+
+    return await OrganisationRepository.saveOrganisation(newOrganisation);
   }
 }

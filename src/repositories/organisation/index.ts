@@ -1,9 +1,9 @@
-import { getManager, getRepository } from "typeorm";
+import { getManager, getRepository, getConnection } from "typeorm";
 import { Member } from "../../entities/member.model";
 import { Organisation } from "../../entities/organisation.model";
 
 export class OrganisationRepository {
-  static async createOrganisation(organisation: Organisation) {
+  static async saveOrganisation(organisation: Organisation) {
     return await getManager().getRepository(Organisation).save(organisation);
   }
 
@@ -26,5 +26,14 @@ export class OrganisationRepository {
       .take(limit)
       .orderBy("organisation.createdAt", "DESC")
       .getMany();
+  }
+
+  static async deleteOrganisation(organisationId: number) {
+    return await getConnection()
+      .createQueryBuilder()
+      .delete()
+      .from(Organisation)
+      .where("id = :id", { id: organisationId })
+      .execute();
   }
 }

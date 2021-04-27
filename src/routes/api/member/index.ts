@@ -61,7 +61,7 @@ export class MemberRoutes {
       }
     });
 
-    this.router.get("/", getToken, async (req: any, res: any) => {
+    this.router.put("/", getToken, async (req: any, res: any) => {
       try {
         let result = null;
         let total = null;
@@ -72,7 +72,7 @@ export class MemberRoutes {
           result = await MemberService.getAllMembers(req.body, true);
           total = await MemberService.getAllMembers(req.body);
           page = parseInt(req.body.pagination.page, 10) || 1;
-          limit = 1;
+          limit = 10;
 
           return new ResponseBuilder<any>()
             .setData(result)
@@ -96,6 +96,71 @@ export class MemberRoutes {
             .setResponseStatus(200)
             .build();
         }
+      } catch (error) {
+        return new ResponseBuilder<any>()
+          .setData(error.message)
+          .setStatus(false)
+          .setResponse(res)
+          .setResponseStatus(400)
+          .build();
+      }
+    });
+
+    this.router.post("/", getToken, async (req: any, res: any) => {
+      try {
+        const result = await MemberService.createMember(req.body);
+
+        return new ResponseBuilder<any>()
+          .setData(result)
+          .setStatus(true)
+          .setResponse(res)
+          .setResponseStatus(200)
+          .build();
+      } catch (error) {
+        return new ResponseBuilder<any>()
+          .setData(error.message)
+          .setStatus(false)
+          .setResponse(res)
+          .setResponseStatus(400)
+          .build();
+      }
+    });
+
+    this.router.put("/:memberId", getToken, async (req: any, res: any) => {
+      try {
+        const result = await MemberService.updateMember(
+          req.body,
+          Number(req.params.memberId)
+        );
+
+        return new ResponseBuilder<any>()
+          .setData(result)
+          .setStatus(true)
+          .setResponse(res)
+          .setResponseStatus(200)
+          .build();
+      } catch (error) {
+        return new ResponseBuilder<any>()
+          .setData(error.message)
+          .setStatus(false)
+          .setResponse(res)
+          .setResponseStatus(400)
+          .build();
+      }
+    });
+
+    this.router.delete("/:memberId", getToken, async (req: any, res: any) => {
+      try {
+        const result = await MemberService.deleteMember(
+          Number(req.params.memberId)
+        );
+
+        return new ResponseBuilder<any>()
+          .setData(result)
+          .setStatus(true)
+          .setResponse(res)
+          .setResponseStatus(200)
+          .build();
       } catch (error) {
         return new ResponseBuilder<any>()
           .setData(error.message)

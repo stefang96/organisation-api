@@ -1,7 +1,7 @@
 import joi from "joi";
 
 export class OrganisationValidation {
-  static async validateOragnisaion(body: any) {
+  static async validateOragnisation(body: any) {
     const schema = joi.object().keys({
       name: joi.string().trim().required().error(new Error("Name is required")),
       type: joi
@@ -16,8 +16,6 @@ export class OrganisationValidation {
         .error(new Error("Address field is required.")),
       numberOfEmployees: joi.allow(null),
     });
-
-    console.log(schema.validate(body));
 
     const result = schema.validate(body);
 

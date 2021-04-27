@@ -47,7 +47,7 @@ export class Nodemailer {
     });
   }
 
-  static async inviteContactPerson(user) {
+  static async inviteUser(user) {
     const subject = "Welcome to Organisation";
     const template =
       ` <div   >
@@ -75,7 +75,6 @@ export class Nodemailer {
   }
 
   static async sendEmailToContactPerson(data, to) {
-    console.log(data);
     const subject = "Add user";
     const template = ` <div   >
   Please add me into your organisation <br> <hr>

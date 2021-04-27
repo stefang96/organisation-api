@@ -33,9 +33,10 @@ export async function apiRoutes(app: express.Application) {
         "/api/auth/signup",
         "/api/auth/reset-password",
         "/api/auth/set-password",
+        "/api/organisation/all",
         { url: /^\/api\/member\/send-email\/.*/, methods: ["PUT"] },
         { url: /^\/api\/news\/.*/, methods: ["GET", "PUT"] },
-        { url: /^\/api\/organisation\/.*/, methods: ["GET", "PUT"] },
+        { url: /^\/api\/organisation\/.*/, methods: ["GET"] },
       ],
     })
   );

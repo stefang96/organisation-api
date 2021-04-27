@@ -40,11 +40,10 @@ export class MemberService {
     newMember.role = MembersRole.ADMIN;
     newMember.active = false;
     newMember.organisation = organisationId as any;
-    console.log(moment().unix());
     newMember.createdAt = moment().unix();
 
-    await Nodemailer.inviteContactPerson(newMember);
-    return await MemberRepository.saveContactPerson(newMember);
+    await Nodemailer.inviteUser(newMember);
+    return await MemberRepository.saveMember(newMember);
   }
 
   static async sendEmailToContactPerson(body: any, memberId) {
@@ -85,5 +84,45 @@ export class MemberService {
     }
     //without pagination
     return await MemberRepository.getAllMembers(query);
+  }
+
+  static async createMember(body: any) {
+    console.log(body);
+    const { firstName, lastName, email, phone, role } = body;
+    const loggedUser = jwt.decode(body.token);
+
+    const newMember = new Member();
+
+    newMember.firstName = firstName;
+    newMember.lastName = lastName;
+    newMember.email = email;
+    newMember.phone = phone ? phone : null;
+    newMember.role = role;
+    newMember.createdAt = moment().unix();
+    newMember.organisation = loggedUser.organisation.id;
+    newMember.active = false;
+    newMember.verifytoken = await bcrypt.hash(email + role, saltRounds);
+
+    await Nodemailer.inviteUser(newMember);
+    return await MemberRepository.saveMember(newMember);
+  }
+
+  static async updateMember(body: any, memberId: number) {
+    console.log(body);
+    const { firstName, lastName, email, phone, role } = body;
+    const loggedUser = jwt.decode(body.token);
+    const member = await this.getMemberById(memberId);
+
+    member.firstName = firstName;
+    member.lastName = lastName;
+    member.email = email;
+    member.phone = phone ? phone : null;
+    member.role = role && role;
+
+    return await MemberRepository.saveMember(member);
+  }
+
+  static async deleteMember(memberId: number) {
+    return await MemberRepository.deleteMember(memberId);
   }
 }
