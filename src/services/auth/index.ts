@@ -37,7 +37,7 @@ export class AuthServices {
 
     createdOrganisation.contactPerson = createdContactPerson;
 
-    await OrganisationRepository.createOrganisation(createdOrganisation);
+    await OrganisationRepository.saveOrganisation(createdOrganisation);
 
     return "Successfully signup! <br/> Please check your email.";
   }
