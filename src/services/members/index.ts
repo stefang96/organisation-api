@@ -57,20 +57,26 @@ export class MemberService {
 
   static async getAllMembers(body: any, paginationValue = false) {
     console.log(body);
-    const { pagination, filters } = body;
+    const { pagination, filters, organisationId } = body;
 
     let query = getManager()
       .getRepository(Member)
       .createQueryBuilder("member")
-      .leftJoinAndSelect("member.organisation", "organisation")
-      .where("member.active = :active", { active: true });
+      .leftJoinAndSelect("member.organisation", "organisation");
 
     if (body.token) {
       const loggedUser = jwt.decode(body.token);
+      if (loggedUser.role === MembersRole.ADMIN) {
+        query = query.andWhere("organisation.id = :organisationId", {
+          organisationId: loggedUser.organisation.id,
+        });
+      }
+    }
+
+    if (organisationId) {
       query = query.andWhere("organisation.id = :organisationId", {
-        organisationId: loggedUser.organisation.id,
+        organisationId: organisationId,
       });
-      console.log(loggedUser);
     }
 
     if (paginationValue) {

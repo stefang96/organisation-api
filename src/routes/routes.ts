@@ -5,6 +5,7 @@ import { AuthRoutes } from "./api/auth";
 import { MemberRoutes } from "./api/member";
 import { NewsRoutes } from "./api/news";
 import { OrganisationRoutes } from "./api/organisation";
+import { PaymentsRoutes } from "./api/payments";
 
 export async function apiRoutes(app: express.Application) {
   app.use((req, res, next) => {
@@ -52,4 +53,5 @@ export async function apiRoutes(app: express.Application) {
   app.use("/api/news", new NewsRoutes().getRouter());
   app.use("/api/organisation", new OrganisationRoutes().getRouter());
   app.use("/api/member", new MemberRoutes().getRouter());
+  app.use("/api/payments", new PaymentsRoutes().getRouter());
 }

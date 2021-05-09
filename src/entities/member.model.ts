@@ -8,6 +8,7 @@ import {
 import { Content } from "./abstract/content";
 import { News } from "./news.model";
 import { Organisation } from "./organisation.model";
+import { Payments } from "./payments.model";
 
 export enum MembersRole {
   SUPER_ADMIN = "super_admin",
@@ -56,4 +57,7 @@ export class Member extends Content {
 
   @OneToMany(() => News, (news) => news.member)
   news: News[];
+
+  @OneToMany(() => Payments, (payments) => payments.member)
+  payments: Payments[];
 }

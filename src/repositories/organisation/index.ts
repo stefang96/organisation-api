@@ -12,6 +12,7 @@ export class OrganisationRepository {
       .getRepository(Organisation)
       .createQueryBuilder("organisation")
       .innerJoinAndSelect("organisation.members", "members")
+      .innerJoinAndSelect("organisation.contactPerson", "contactPerson")
       .where("organisation.id = :id", { id: organisationId })
       .getOne();
   }

@@ -4,6 +4,8 @@ import { OrganisationValidation } from "../../utilities/organisation/validation"
 import { getManager, Brackets } from "typeorm";
 import jwt from "jsonwebtoken";
 import moment = require("moment");
+import { MemberRepository } from "../../repositories/member";
+import { MembersRole } from "../../entities/member.model";
 
 export class OrganisationService {
   static async createPublicOrganisation(organisation: any) {
@@ -40,15 +42,15 @@ export class OrganisationService {
       .getRepository(Organisation)
       .createQueryBuilder("organisation")
       .leftJoinAndSelect("organisation.members", "member")
-      .leftJoinAndSelect("organisation.contactPerson", "contactPerson")
-      .where("organisation.active = :active", { active: true });
+      .leftJoinAndSelect("organisation.contactPerson", "contactPerson");
 
     if (body.token) {
       const loggedUser = jwt.decode(body.token);
-      /*  query = query.andWhere("organisation.id = :organisationId", {
-        organisationId: loggedUser.organisation.id,
-      }); */
-      console.log(loggedUser);
+      if (loggedUser.role === MembersRole.ADMIN) {
+        query = query.andWhere("organisation.id = :organisationId", {
+          organisationId: loggedUser.organisation.id,
+        });
+      }
     }
 
     if (body.filters) {
@@ -118,5 +120,9 @@ export class OrganisationService {
     newOrganisation.createdAt = moment().unix();
 
     return await OrganisationRepository.saveOrganisation(newOrganisation);
+  }
+
+  static async getOrganisationAdmins(organisationId) {
+    return await MemberRepository.getOrganisationAdmins(organisationId);
   }
 }

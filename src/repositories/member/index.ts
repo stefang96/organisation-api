@@ -1,5 +1,5 @@
 import { getManager, getRepository, getConnection } from "typeorm";
-import { Member } from "../../entities/member.model";
+import { Member, MembersRole } from "../../entities/member.model";
 
 export class MemberRepository {
   static async saveMember(member: any) {
@@ -68,5 +68,15 @@ export class MemberRepository {
       .from(Member)
       .where("id = :id", { id: memberId })
       .execute();
+  }
+
+  static async getOrganisationAdmins(organisationId) {
+    return await getManager()
+      .getRepository(Member)
+      .createQueryBuilder("member")
+      .innerJoinAndSelect("member.organisation", "organisation")
+      .where("organisation.id = :id", { id: organisationId })
+      .andWhere("member.role = :role", { role: MembersRole.ADMIN })
+      .getMany();
   }
 }

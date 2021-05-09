@@ -44,9 +44,10 @@ export class AuthServices {
 
   static async login(body: any) {
     const { email, password } = body;
-
+    console.log(body);
     const member = await MemberRepository.getMemberByEmail(email);
 
+    console.log(member);
     if (!member) {
       return;
     }

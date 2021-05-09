@@ -1,5 +1,6 @@
 import { Request, Response, Router } from "express";
 import { getToken } from "../../../middleware";
+import { AuthServices } from "../../../services/auth";
 import { OrganisationService } from "../../../services/organisation";
 import { ResponseBuilder } from "../../../utilities/response";
 
@@ -29,6 +30,32 @@ export class OrganisationRoutes {
           .build();
       }
     });
+
+    this.router.get(
+      "/get-admins/:organisationId",
+      async (req: Request, res: Response) => {
+        try {
+          const organisationId = req.params.organisationId;
+          const result = await OrganisationService.getOrganisationAdmins(
+            Number(organisationId)
+          );
+
+          return new ResponseBuilder<any>()
+            .setData(result)
+            .setStatus(true)
+            .setResponse(res)
+            .setResponseStatus(200)
+            .build();
+        } catch (error) {
+          return new ResponseBuilder<any>()
+            .setData(error.message)
+            .setStatus(false)
+            .setResponse(res)
+            .setResponseStatus(400)
+            .build();
+        }
+      }
+    );
 
     this.router.put("/all", getToken, async (req: Request, res: Response) => {
       try {
@@ -77,8 +104,7 @@ export class OrganisationRoutes {
 
     this.router.post("/", getToken, async (req: any, res: any) => {
       try {
-        const result = await OrganisationService.createOrganisation(req.body);
-
+        const result = await AuthServices.signup(req.body);
         return new ResponseBuilder<any>()
           .setData(result)
           .setStatus(true)

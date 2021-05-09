@@ -12,7 +12,6 @@ export class AuthRoutes {
       checkMemberEmail,
       async (req: Request, res: Response) => {
         try {
-          console.log(req.body);
           const result = await AuthServices.signup(req.body);
 
           return new ResponseBuilder<any>()
