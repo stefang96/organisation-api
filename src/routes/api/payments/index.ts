@@ -54,6 +54,27 @@ export class PaymentsRoutes {
       }
     });
 
+    this.router.get("/payment/latest", async (req: Request, res: Response) => {
+      try {
+        const token = req.headers.authorization.toString().split(" ")[1];
+        const result = await PaymentsService.getLatestPayment(token);
+
+        return new ResponseBuilder<any>()
+          .setData(result)
+          .setStatus(true)
+          .setResponse(res)
+          .setResponseStatus(200)
+          .build();
+      } catch (error) {
+        return new ResponseBuilder<any>()
+          .setData(error.message)
+          .setStatus(false)
+          .setResponse(res)
+          .setResponseStatus(400)
+          .build();
+      }
+    });
+
     this.router.put("/all", getToken, async (req: Request, res: Response) => {
       try {
         let result = null;

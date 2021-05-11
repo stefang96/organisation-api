@@ -20,6 +20,15 @@ export class PaymentsService {
     return await PaymentsRepository.getPaymentsById(paymentsId);
   }
 
+  static async getLatestPayment(token) {
+    const loggedUser = jwt.decode(token);
+    const payments = (await PaymentsRepository.getLatestPayment(
+      loggedUser.id
+    )) as any;
+
+    return payments[0];
+  }
+
   static async getPayments(body: any, paginationValue = false) {
     const { pagination, filters, memberId } = body;
 

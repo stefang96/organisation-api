@@ -23,6 +23,17 @@ export class PaymentsRepository {
       .getMany();
   }
 
+  static async getLatestPayment(memberId) {
+    return await getManager()
+      .getRepository(Payments)
+      .createQueryBuilder("payments")
+      .innerJoinAndSelect("payments.member", "member")
+      .innerJoinAndSelect("member.organisation", "organisation")
+      .where("member.id = :id", { id: memberId })
+      .orderBy("payments.createdAt", "DESC")
+      .getMany();
+  }
+
   static async getAllPayments(query: any) {
     return await query.getMany();
   }
