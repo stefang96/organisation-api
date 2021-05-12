@@ -10,6 +10,7 @@ import { OrganisationRepository } from "../../repositories/organisation";
 import { object } from "joi";
 import { Nodemailer } from "../../utilities/email/nodemailer";
 import crypto from "crypto";
+import { PaymentsService } from "../payments";
 
 const saltRounds = 10;
 export class AuthServices {
@@ -20,9 +21,8 @@ export class AuthServices {
       type: body.type,
       address: body.address,
     };
-    const createdOrganisation = await OrganisationService.createPublicOrganisation(
-      organisation
-    );
+    const createdOrganisation =
+      await OrganisationService.createPublicOrganisation(organisation);
 
     const contactPerson = {
       email: body.email,
@@ -44,10 +44,9 @@ export class AuthServices {
 
   static async login(body: any) {
     const { email, password } = body;
-    console.log(body);
+
     const member = await MemberRepository.getMemberByEmail(email);
 
-    console.log(member);
     if (!member) {
       return;
     }
@@ -58,7 +57,16 @@ export class AuthServices {
       return;
     }
 
-    return await MemberHelper.setLoginResponse(member);
+    const payment = await PaymentsService.getLatestPaymentByMemberId(member.id);
+
+    let updatedMember = member;
+    if (payment && Number(payment.toDate) < Number(moment().unix())) {
+      member.active = false;
+
+      updatedMember = await MemberRepository.saveMember(member);
+    }
+
+    return await MemberHelper.setLoginResponse(updatedMember);
   }
 
   static async verifyMember(query: any, res: Response) {

@@ -3,6 +3,9 @@ import { Payments } from "../../entities/payments.model";
 import { PaymentsRepository } from "../../repositories/payments";
 import moment = require("moment");
 import jwt from "jsonwebtoken";
+import { MemberService } from "../members";
+import { MemberRepository } from "../../repositories/member";
+import { MemberHelper } from "../../utilities/member";
 
 export class PaymentsService {
   static async createPayments(body: any) {
@@ -13,8 +16,15 @@ export class PaymentsService {
     payments.fromDate = moment().unix();
     payments.toDate = moment().add(1, "years").unix();
     payments.member = loggedUser.id;
+    payments.active = true;
 
-    return await PaymentsRepository.savePayments(payments);
+    await PaymentsRepository.savePayments(payments);
+
+    const member = await MemberService.getMemberById(loggedUser.id);
+    member.active = true;
+    const updatedMember = await MemberRepository.saveMember(member);
+
+    return await MemberHelper.setLoginResponse(updatedMember);
   }
   static async getPaymentsById(paymentsId: number) {
     return await PaymentsRepository.getPaymentsById(paymentsId);
@@ -29,15 +39,25 @@ export class PaymentsService {
     return payments[0];
   }
 
+  static async getLatestPaymentByMemberId(memberId) {
+    const payments = (await PaymentsRepository.getLatestPayment(
+      memberId
+    )) as any;
+
+    if (payments) return payments[0];
+
+    return null;
+  }
+
   static async getPayments(body: any, paginationValue = false) {
     const { pagination, filters, memberId } = body;
+    console.log(body);
 
     let query = getManager()
       .getRepository(Payments)
       .createQueryBuilder("payments")
       .leftJoinAndSelect("payments.member", "member")
-      .leftJoinAndSelect("member.organisation", "organisation")
-      .where("payments.active = :active", { active: true });
+      .leftJoinAndSelect("member.organisation", "organisation");
 
     if (body.token) {
     }
