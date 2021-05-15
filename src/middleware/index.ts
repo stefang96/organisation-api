@@ -4,7 +4,9 @@ import { MemberHelper } from "../utilities/member";
 export const getToken = async (req, res, next) => {
   if (req.headers.authorization) {
     const token = req.headers.authorization.toString().split(" ")[1];
-    req.body.token = token;
+    if (token) {
+      req.body.token = token;
+    }
   }
 
   next();

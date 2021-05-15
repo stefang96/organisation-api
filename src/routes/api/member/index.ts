@@ -61,16 +61,17 @@ export class MemberRoutes {
       }
     });
 
-    this.router.put("/", getToken, async (req: any, res: any) => {
+    this.router.put("/get-all", async (req: any, res: any) => {
       try {
         let result = null;
         let total = null;
         let page = null;
         let limit = null;
+        const token = req.headers.authorization.toString().split(" ")[1];
         console.log(req.body);
         if (req.body.pagination) {
-          result = await MemberService.getAllMembers(req.body, true);
-          total = await MemberService.getAllMembers(req.body);
+          result = await MemberService.getAllMembers(req.body, token, true);
+          total = await MemberService.getAllMembers(req.body, token);
           page = parseInt(req.body.pagination.page, 10) || 1;
           limit = 10;
 
@@ -87,7 +88,7 @@ export class MemberRoutes {
             .setResponseStatus(200)
             .build();
         } else {
-          result = await MemberService.getAllMembers(req.body);
+          result = await MemberService.getAllMembers(req.body, token);
 
           return new ResponseBuilder<any>()
             .setData(result)

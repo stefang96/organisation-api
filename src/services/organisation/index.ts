@@ -54,7 +54,7 @@ export class OrganisationService {
     }
 
     if (body.filters) {
-      const { country, search } = filters;
+      const { memberId, search } = filters;
 
       if (search) {
         query = query.andWhere("LOWER(organisation.name)  like LOWER(:name)", {
@@ -62,11 +62,10 @@ export class OrganisationService {
         });
       }
 
-      if (country) {
-        /*
-        query = query.andWhere("organisation.id = :organisationId", {
-          organisationId: organisationId,
-        }); */
+      if (memberId) {
+        query = query.andWhere("contactPerson.id = :memberId", {
+          memberId: memberId,
+        });
       }
     }
 
@@ -97,7 +96,9 @@ export class OrganisationService {
     organisation.address = address;
     organisation.contactPerson = contactPerson as any;
 
-    return await OrganisationRepository.saveOrganisation(organisation);
+    await OrganisationRepository.saveOrganisation(organisation);
+
+    return await this.getOrganisationById(organisationdId);
   }
 
   static async deleteOrganisation(organisationdId: number) {

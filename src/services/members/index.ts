@@ -55,17 +55,16 @@ export class MemberService {
     return await MemberRepository.getMemberById(memberId);
   }
 
-  static async getAllMembers(body: any, paginationValue = false) {
-    console.log(body);
+  static async getAllMembers(body: any, token = null, paginationValue = false) {
     const { pagination, filters, organisationId } = body;
-
+    console.log({ pagination, filters, token, organisationId });
     let query = getManager()
       .getRepository(Member)
       .createQueryBuilder("member")
       .leftJoinAndSelect("member.organisation", "organisation");
 
-    if (body.token) {
-      const loggedUser = jwt.decode(body.token);
+    if (token !== "null") {
+      const loggedUser = jwt.decode(token);
       if (loggedUser.role === MembersRole.ADMIN) {
         query = query.andWhere("organisation.id = :organisationId", {
           organisationId: loggedUser.organisation.id,
@@ -77,6 +76,28 @@ export class MemberService {
       query = query.andWhere("organisation.id = :organisationId", {
         organisationId: organisationId,
       });
+    }
+
+    if (body.filters) {
+      const { status, search } = filters;
+
+      if (search) {
+        query = query.andWhere(
+          new Brackets((qb) => {
+            qb.where("LOWER(member.firstName)  like LOWER(:firstName)", {
+              firstName: "%" + search + "%",
+            }).orWhere("LOWER(member.lastName)  like LOWER(:lastName)", {
+              lastName: "%" + search + "%",
+            });
+          })
+        );
+      }
+
+      if (status) {
+        query = query.andWhere("member.status = :status", {
+          status: status,
+        });
+      }
     }
 
     if (paginationValue) {

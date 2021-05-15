@@ -67,6 +67,15 @@ export class PaymentsService {
         memberId: memberId,
       });
     }
+    if (body.filters) {
+      const { memberId } = filters;
+
+      if (memberId) {
+        query = query.andWhere("member.id = :id", {
+          id: memberId,
+        });
+      }
+    }
 
     if (paginationValue) {
       // Pagination

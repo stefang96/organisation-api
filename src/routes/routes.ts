@@ -35,6 +35,7 @@ export async function apiRoutes(app: express.Application) {
         "/api/auth/reset-password",
         "/api/auth/set-password",
         "/api/organisation/all",
+        "/api/member/get-all",
         { url: /^\/api\/member\/send-email\/.*/, methods: ["PUT"] },
         { url: /^\/api\/news\/.*/, methods: ["GET", "PUT"] },
         { url: /^\/api\/organisation\/.*/, methods: ["GET"] },

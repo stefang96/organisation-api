@@ -61,6 +61,7 @@ export class NewsService {
   static async getNews(body: any, paginationValue = false) {
     const { pagination, filters, memberId } = body;
 
+    console.log({ pagination, filters, memberId });
     let query = getManager()
       .getRepository(News)
       .createQueryBuilder("news")
@@ -84,7 +85,7 @@ export class NewsService {
     }
 
     if (body.filters) {
-      const { organisationId, search } = filters;
+      const { organisationId, search, memberId } = filters;
 
       if (search) {
         query = query.andWhere(
@@ -105,6 +106,12 @@ export class NewsService {
       if (organisationId) {
         query = query.andWhere("organisation.id = :organisationId", {
           organisationId: organisationId,
+        });
+      }
+
+      if (memberId) {
+        query = query.andWhere("member.id = :memberId", {
+          memberId: memberId,
         });
       }
     }
