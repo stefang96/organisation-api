@@ -61,6 +61,27 @@ export class MemberRoutes {
       }
     });
 
+    this.router.get("/contact-persons/get-all", async (req: any, res: any) => {
+      try {
+        console.log("ffff");
+        const result = await MemberService.getAllContactPersons();
+
+        return new ResponseBuilder<any>()
+          .setData(result)
+          .setStatus(true)
+          .setResponse(res)
+          .setResponseStatus(201)
+          .build();
+      } catch (error) {
+        return new ResponseBuilder<any>()
+          .setData(error.message)
+          .setStatus(false)
+          .setResponse(res)
+          .setResponseStatus(400)
+          .build();
+      }
+    });
+
     this.router.put("/get-all", async (req: any, res: any) => {
       try {
         let result = null;

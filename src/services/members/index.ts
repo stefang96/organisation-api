@@ -55,6 +55,18 @@ export class MemberService {
     return await MemberRepository.getMemberById(memberId);
   }
 
+  static async getAllContactPersons() {
+    const contactPersons =
+      (await MemberRepository.getAllContactPersons()) as any;
+
+    const response = [];
+    contactPersons.forEach((element) => {
+      response.push(element.contactPerson);
+    });
+
+    return response;
+  }
+
   static async getAllMembers(body: any, token = null, paginationValue = false) {
     const { pagination, filters, organisationId } = body;
     console.log({ pagination, filters, token, organisationId });
@@ -94,7 +106,7 @@ export class MemberService {
       }
 
       if (status) {
-        query = query.andWhere("member.status = :status", {
+        query = query.andWhere("member.active = :status", {
           status: status,
         });
       }

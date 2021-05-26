@@ -1,5 +1,6 @@
 import { getManager, getRepository, getConnection } from "typeorm";
 import { Member, MembersRole } from "../../entities/member.model";
+import { Organisation } from "../../entities/organisation.model";
 
 export class MemberRepository {
   static async saveMember(member: any) {
@@ -23,6 +24,20 @@ export class MemberRepository {
     return await getManager()
       .getRepository(Member)
       .findOne({ email: email, verifytoken: verifytoken });
+  }
+
+  static async getAllContactPersons() {
+    return await getManager()
+      .getRepository(Organisation)
+      .createQueryBuilder("organisation")
+      .leftJoinAndSelect("organisation.contactPerson", "contactPerson")
+      .select([
+        "organisation.id",
+        "contactPerson.id",
+        "contactPerson.firstName",
+        "contactPerson.lastName",
+      ])
+      .getMany();
   }
 
   static async getSetPasswordMember(params: any) {
