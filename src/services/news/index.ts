@@ -58,6 +58,30 @@ export class NewsService {
     return await NewsRepository.getNewsById(newsId);
   }
 
+  static async getLatestNews(body) {
+    let query = getManager()
+      .getRepository(News)
+      .createQueryBuilder("news")
+      .innerJoinAndSelect("news.member", "member")
+      .innerJoinAndSelect("member.organisation", "organisation");
+
+    if (body.token) {
+      const loggedUser = jwt.decode(body.token);
+      if (loggedUser.role !== "super_admin") {
+        query = query.andWhere("organisation.id = :organisationId", {
+          organisationId: loggedUser.organisation.id,
+        });
+      }
+    }
+
+    if (body.memberId) {
+      query = query.andWhere("member.id = :memberId", {
+        memberId: body.memberId,
+      });
+    }
+    return await NewsRepository.getLatestNews(query);
+  }
+
   static async getNews(body: any, paginationValue = false) {
     const { pagination, filters, memberId } = body;
 

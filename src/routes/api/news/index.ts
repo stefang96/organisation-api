@@ -33,6 +33,30 @@ export class NewsRoutes {
       }
     });
 
+    this.router.put(
+      "/get-latest",
+      getToken,
+      async (req: Request, res: Response) => {
+        try {
+          const result = await NewsService.getLatestNews(req.body);
+
+          return new ResponseBuilder<any>()
+            .setData(result)
+            .setStatus(true)
+            .setResponse(res)
+            .setResponseStatus(200)
+            .build();
+        } catch (error) {
+          return new ResponseBuilder<any>()
+            .setData(error.message)
+            .setStatus(false)
+            .setResponse(res)
+            .setResponseStatus(400)
+            .build();
+        }
+      }
+    );
+
     this.router.get("/:newsId", async (req: Request, res: Response) => {
       try {
         const newsId = req.params.newsId;

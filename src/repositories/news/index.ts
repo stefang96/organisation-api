@@ -1,5 +1,6 @@
 import { News } from "../../entities/news.model";
 import { getManager, getRepository, getConnection } from "typeorm";
+import { query } from "express";
 
 export class NewsRepository {
   static async saveNews(news: News) {
@@ -13,6 +14,10 @@ export class NewsRepository {
       .innerJoinAndSelect("member.organisation", "organisation")
       .where("news.id = :id", { id: newsId })
       .getOne();
+  }
+
+  static async getLatestNews(query) {
+    return await query.orderBy("news.createdAt", "DESC").getMany();
   }
 
   static async getNews(query: any, startIndex, limit) {
