@@ -17,11 +17,14 @@ export class Organisation extends Content {
   @Column({ name: "Address", nullable: true })
   address: string;
 
-  @Column({ name: "Type", nullable: false })
+  @Column({ name: "Type", nullable: true })
   type: string;
 
   @Column({ name: "NumberOfEmployees", nullable: true })
   numberOfEmployees: number;
+
+  @Column({ name: "Price", nullable: true })
+  price: number;
 
   @OneToOne(() => Member)
   @JoinColumn()

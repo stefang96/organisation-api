@@ -4,11 +4,7 @@ export class OrganisationValidation {
   static async validateOragnisation(body: any) {
     const schema = joi.object().keys({
       name: joi.string().trim().required().error(new Error("Name is required")),
-      type: joi
-        .string()
-        .min(2)
-        .required()
-        .error(new Error("Organisation Type is required.")),
+      price: joi.string().required().error(new Error("Price is required.")),
       address: joi
         .string()
         .min(2)

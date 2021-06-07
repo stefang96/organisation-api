@@ -11,6 +11,7 @@ export class OrganisationService {
   static async createPublicOrganisation(organisation: any) {
     // Organisation validaton
 
+    console.log(organisation);
     const isValid = await OrganisationValidation.validateOragnisation(
       organisation
     );
@@ -22,7 +23,7 @@ export class OrganisationService {
     const newOrganisation = new Organisation();
     newOrganisation.name = organisation.name;
     newOrganisation.numberOfEmployees = organisation.numberOfEmployees;
-    newOrganisation.type = organisation.type;
+    newOrganisation.price = organisation.price;
     newOrganisation.address = organisation.address;
     newOrganisation.active = true;
     newOrganisation.createdAt = moment().unix();
@@ -35,7 +36,6 @@ export class OrganisationService {
   }
 
   static async getAllOrganisation(body: any, paginationValue = false) {
-    console.log(body);
     const { pagination, filters } = body;
 
     let query = getManager()

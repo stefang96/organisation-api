@@ -17,8 +17,8 @@ export class AuthServices {
   static async signup(body: any) {
     const organisation = {
       name: body.name,
-      numberOfEmployees: body.numberOfEmployees,
-      type: body.type,
+      numberOfEmployees: body.numberOfEmployees ? body.numberOfEmployees : null,
+      price: body.price,
       address: body.address,
     };
     const createdOrganisation =
@@ -100,11 +100,13 @@ export class AuthServices {
     const { params, data } = body;
 
     const member = await MemberRepository.getSetPasswordMember(params);
-    const checkPassword = await MemberValidation.checkPassword(data);
+    console.log("1.1");
+    // const checkPassword = await MemberValidation.checkPassword(data);
 
-    if (!checkPassword) {
-      throw new Error("Password and confirm password does not match!");
-    }
+    console.log("1");
+    //// if (!checkPassword) {
+    // throw new Error("Password and confirm password does not match!");
+    //  }
 
     if (!member) {
       throw new Error("Member does not exist!");
@@ -117,8 +119,8 @@ export class AuthServices {
       salt
     );
     member.password = hashPassword;
-
-    await MemberRepository.saveMember(member);
+    console.log("2");
+    return await MemberRepository.saveMember(member);
   }
 
   static async resetPassword(body: any) {
