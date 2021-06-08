@@ -29,6 +29,7 @@ export class MemberHelper {
       organisation: {
         id: member.organisation.id,
         name: member.organisation.name,
+        price: member.organisation.price,
       },
     };
 

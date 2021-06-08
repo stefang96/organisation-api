@@ -74,10 +74,10 @@ export class MemberService {
       .getRepository(Member)
       .createQueryBuilder("member")
       .leftJoinAndSelect("member.organisation", "organisation");
-
+    console.log({ token });
     if (token !== "null") {
       const loggedUser = jwt.decode(token);
-      if (loggedUser.role === MembersRole.ADMIN) {
+      if (loggedUser.role !== MembersRole.SUPER_ADMIN) {
         query = query.andWhere("organisation.id = :organisationId", {
           organisationId: loggedUser.organisation.id,
         });

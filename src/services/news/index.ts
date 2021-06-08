@@ -85,7 +85,6 @@ export class NewsService {
   static async getNews(body: any, paginationValue = false) {
     const { pagination, filters, memberId } = body;
 
-    console.log({ pagination, filters, memberId });
     let query = getManager()
       .getRepository(News)
       .createQueryBuilder("news")

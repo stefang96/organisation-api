@@ -60,6 +60,12 @@ export class PaymentsService {
       .leftJoinAndSelect("member.organisation", "organisation");
 
     if (body.token) {
+      const loggedUser = jwt.decode(body.token);
+      if (loggedUser.role !== "super_admin") {
+        query = query.andWhere("organisation.id = :organisationId", {
+          organisationId: loggedUser.organisation.id,
+        });
+      }
     }
 
     if (body.memberId) {
