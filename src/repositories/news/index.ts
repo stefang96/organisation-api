@@ -17,7 +17,11 @@ export class NewsRepository {
   }
 
   static async getLatestNews(query) {
-    return await query.orderBy("news.createdAt", "DESC").getMany();
+    return await query
+      .skip(0)
+      .take(5)
+      .orderBy("news.createdAt", "DESC")
+      .getMany();
   }
 
   static async getNews(query: any, startIndex, limit) {

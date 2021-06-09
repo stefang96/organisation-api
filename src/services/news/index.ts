@@ -74,11 +74,6 @@ export class NewsService {
       }
     }
 
-    if (body.memberId) {
-      query = query.andWhere("member.id = :memberId", {
-        memberId: body.memberId,
-      });
-    }
     return await NewsRepository.getLatestNews(query);
   }
 
