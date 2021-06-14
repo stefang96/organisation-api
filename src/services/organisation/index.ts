@@ -88,11 +88,13 @@ export class OrganisationService {
 
   static async updateOrganisation(body: Organisation, organisationdId: number) {
     const organisation = await this.getOrganisationById(organisationdId);
-    const { name, numberOfEmployees, type, address, contactPerson } = body;
+    const { name, numberOfEmployees, type, address, contactPerson, price } =
+      body;
 
     organisation.name = name;
     organisation.numberOfEmployees = numberOfEmployees;
     organisation.type = type;
+    organisation.price = price;
     organisation.address = address;
     organisation.contactPerson = contactPerson as any;
 
@@ -115,7 +117,8 @@ export class OrganisationService {
     const newOrganisation = new Organisation();
     newOrganisation.name = body.name;
     newOrganisation.numberOfEmployees = body.numberOfEmployees;
-    newOrganisation.type = body.type;
+
+    newOrganisation.price = body.price;
     newOrganisation.address = body.address;
     newOrganisation.active = true;
     newOrganisation.createdAt = moment().unix();

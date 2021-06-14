@@ -7,7 +7,7 @@ import * as bcrypt from "bcrypt";
 import { MemberHelper } from "../../utilities/member";
 import { MemberValidation } from "../../utilities/member/validation";
 import { OrganisationRepository } from "../../repositories/organisation";
-import { object } from "joi";
+import jwt from "jsonwebtoken";
 import { Nodemailer } from "../../utilities/email/nodemailer";
 import crypto from "crypto";
 import { PaymentsService } from "../payments";
@@ -42,6 +42,22 @@ export class AuthServices {
     return "Successfully signup! <br/> Please check your email.";
   }
 
+  static async changePassword(body: any, token) {
+    console.log(body);
+    console.log(token);
+    const { password, rePassword } = body;
+    const loggedUser = jwt.decode(token);
+
+    if (password.toString().trim() !== rePassword.toString().trim()) {
+      throw new Error("Password does not match");
+    }
+    const member = await MemberRepository.getMemberById(loggedUser.id);
+
+    const salt = await bcrypt.genSalt(10);
+    const hashPassword = await bcrypt.hash(password.toString().trim(), salt);
+    member.password = hashPassword;
+    return await MemberRepository.saveMember(member);
+  }
   static async login(body: any) {
     const { email, password } = body;
 

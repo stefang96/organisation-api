@@ -6,7 +6,7 @@ export class Nodemailer {
       service: "gmail",
       auth: {
         user: "organisationetf@gmail.com",
-        pass: "1677stef",
+        pass: "",
       },
     });
 
