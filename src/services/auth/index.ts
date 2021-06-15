@@ -43,8 +43,6 @@ export class AuthServices {
   }
 
   static async changePassword(body: any, token) {
-    console.log(body);
-    console.log(token);
     const { password, rePassword } = body;
     const loggedUser = jwt.decode(token);
 
@@ -116,10 +114,9 @@ export class AuthServices {
     const { params, data } = body;
 
     const member = await MemberRepository.getSetPasswordMember(params);
-    console.log("1.1");
+
     // const checkPassword = await MemberValidation.checkPassword(data);
 
-    console.log("1");
     //// if (!checkPassword) {
     // throw new Error("Password and confirm password does not match!");
     //  }
@@ -135,7 +132,7 @@ export class AuthServices {
       salt
     );
     member.password = hashPassword;
-    console.log("2");
+
     return await MemberRepository.saveMember(member);
   }
 

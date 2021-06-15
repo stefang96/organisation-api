@@ -63,7 +63,6 @@ export class MemberRoutes {
 
     this.router.get("/contact-persons/get-all", async (req: any, res: any) => {
       try {
-        console.log("ffff");
         const result = await MemberService.getAllContactPersons();
 
         return new ResponseBuilder<any>()
@@ -89,7 +88,7 @@ export class MemberRoutes {
         let page = null;
         let limit = null;
         const token = req.headers.authorization.toString().split(" ")[1];
-        console.log(req.body);
+
         if (req.body.pagination) {
           result = await MemberService.getAllMembers(req.body, token, true);
           total = await MemberService.getAllMembers(req.body, token);

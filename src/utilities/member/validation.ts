@@ -22,8 +22,6 @@ export class MemberValidation {
       phone: joi.allow(null),
     });
 
-    console.log(schema.validate(body));
-
     const result = schema.validate(body);
 
     if (result.error) {

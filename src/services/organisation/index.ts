@@ -11,7 +11,6 @@ export class OrganisationService {
   static async createPublicOrganisation(organisation: any) {
     // Organisation validaton
 
-    console.log(organisation);
     const isValid = await OrganisationValidation.validateOragnisation(
       organisation
     );

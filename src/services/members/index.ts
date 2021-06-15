@@ -69,12 +69,12 @@ export class MemberService {
 
   static async getAllMembers(body: any, token = null, paginationValue = false) {
     const { pagination, filters, organisationId } = body;
-    console.log({ pagination, filters, token, organisationId });
+
     let query = getManager()
       .getRepository(Member)
       .createQueryBuilder("member")
       .leftJoinAndSelect("member.organisation", "organisation");
-    console.log({ token });
+
     if (token !== "null") {
       const loggedUser = jwt.decode(token);
       if (loggedUser.role !== MembersRole.SUPER_ADMIN) {
@@ -126,7 +126,6 @@ export class MemberService {
   }
 
   static async createMember(body: any) {
-    console.log(body);
     const { firstName, lastName, email, phone, role } = body;
     const loggedUser = jwt.decode(body.token);
 
@@ -147,7 +146,6 @@ export class MemberService {
   }
 
   static async updateMember(body: any, memberId: number) {
-    console.log(body);
     const { firstName, lastName, email, phone, role } = body;
     const loggedUser = jwt.decode(body.token);
     const member = await this.getMemberById(memberId);

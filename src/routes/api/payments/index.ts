@@ -1,7 +1,4 @@
 import { Request, Response, Router } from "express";
-import { News } from "../../../entities/news.model";
-import { AuthServices } from "../../../services/auth";
-import { NewsService } from "../../../services/news";
 import { ResponseBuilder } from "../../../utilities/response";
 import { getToken } from "../../../middleware/index";
 import { PaymentsService } from "../../../services/payments";
@@ -12,7 +9,6 @@ export class PaymentsRoutes {
   public getRouter(): Router {
     this.router.post("/", getToken, async (req: any, res: any) => {
       try {
-        console.log(req.body);
         const result = await PaymentsService.createPayments(req.body);
 
         return new ResponseBuilder<any>()

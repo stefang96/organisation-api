@@ -76,8 +76,6 @@ export class AuthRoutes {
     });
     this.router.get("/verify", async (req: Request, res: Response) => {
       try {
-        console.log(req.params);
-        console.log(req.query);
         const result = await AuthServices.verifyMember(req.query, res);
       } catch (e) {
         return new ResponseBuilder<any>()
@@ -90,7 +88,6 @@ export class AuthRoutes {
 
     this.router.post("/set-password", async (req: Request, res: Response) => {
       try {
-        console.log(req.body);
         await AuthServices.setPassword(req.body);
 
         const result =

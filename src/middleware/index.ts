@@ -15,10 +15,9 @@ export const getToken = async (req, res, next) => {
 export const checkMemberEmail = async (req, res: Response, next) => {
   try {
     const email = req.body.email;
-    console.log(req.body);
+
     const ifExist = await MemberHelper.memberEmailExist(email);
 
-    console.log(ifExist);
     if (ifExist) {
       throw new Error();
     }

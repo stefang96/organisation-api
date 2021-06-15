@@ -63,7 +63,7 @@ export class OrganisationRoutes {
         let total = null;
         let page = null;
         let limit = null;
-        console.log(req.body);
+
         if (req.body.pagination) {
           result = await OrganisationService.getAllOrganisation(req.body, true);
           total = await OrganisationService.getAllOrganisation(req.body);

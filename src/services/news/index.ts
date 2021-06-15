@@ -148,11 +148,9 @@ export class NewsService {
   }
 
   static async updateNews(body: News, newsId: number, files: any) {
-    console.log(body);
-    console.log(files);
     await NewsRepository.updateNews(body, newsId);
     const news = await this.getNewsById(newsId);
-    console.log(news);
+
     if (files) {
       let fileNews = files.file;
       if (files.file.length > 1) {

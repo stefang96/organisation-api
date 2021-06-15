@@ -66,7 +66,6 @@ export class Nodemailer {
   }
 
   static async resetPassword(password, email) {
-    console.log(email);
     const subject = "Reset password";
     const template = ` <div   >
      Your password is: ${password}

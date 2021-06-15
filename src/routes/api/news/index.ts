@@ -1,6 +1,5 @@
 import { Request, Response, Router } from "express";
-import { News } from "../../../entities/news.model";
-import { AuthServices } from "../../../services/auth";
+
 import { NewsService } from "../../../services/news";
 import { ResponseBuilder } from "../../../utilities/response";
 import { getToken } from "../../../middleware/index";
@@ -11,10 +10,6 @@ export class NewsRoutes {
   public getRouter(): Router {
     this.router.post("/", getToken, async (req: any, res: any) => {
       try {
-        console.log(req.body);
-
-        console.log(req.files);
-
         const result = await NewsService.createNews(req.body, req.files);
 
         return new ResponseBuilder<any>()

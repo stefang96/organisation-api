@@ -51,7 +51,6 @@ export class PaymentsService {
 
   static async getPayments(body: any, paginationValue = false) {
     const { pagination, filters, memberId } = body;
-    console.log(body);
 
     let query = getManager()
       .getRepository(Payments)
