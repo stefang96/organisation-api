@@ -91,7 +91,7 @@ export class AuthServices {
     }
     member.createdAt = moment().unix();
     member.verified = true;
-    member.active = true;
+
     member.verifytoken = null;
     member.setpasswordtoken = await bcrypt.hash(
       member.role + member.email,

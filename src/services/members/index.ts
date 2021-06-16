@@ -38,7 +38,7 @@ export class MemberService {
     newMember.lastName = contactPerson.lastName;
     newMember.phone = contactPerson.phone;
     newMember.role = MembersRole.ADMIN;
-    newMember.active = false;
+    newMember.active = true;
     newMember.organisation = organisationId as any;
     newMember.createdAt = moment().unix();
 
