@@ -1,0 +1,59 @@
+{
+  "name": "organisation-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "clean": "rimraf dist/*",
+    "lint": "tslint -c tslint.json -p tsconfig.json --fix",
+    "tsc": "tsc",
+    "build": "npm-run-all clean tsc",
+    "dev:start": "npm-run-all build start",
+    "dev": "nodemon --watch src -e ts --exec npm run dev:start",
+    "start": "node .",
+    "initdb": "ts-node tools/initdb",
+    "docs": "jsdoc -c jsdoc.json",
+    "test": "jest ",
+    "version": "echo $npm_package_version"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stefang96/organisation-api.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/stefang96/organisation-api/issues"
+  },
+  "homepage": "https://github.com/stefang96/organisation-api#readme",
+  "dependencies": {
+    "bcrypt": "^5.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-fileupload": "^1.2.1",
+    "express-jwt": "^6.0.0",
+    "joi": "^17.3.0",
+    "jsonwebtoken": "^8.5.1",
+    "moment": "^2.29.1",
+    "multer": "^1.4.2",
+    "nodemailer": "^6.4.17",
+    "pg": "^8.5.1",
+    "typeorm": "^0.2.30"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.11",
+    "@types/jest": "^26.0.23",
+    "@types/node": "^14.14.20",
+    "jest": "^26.6.3",
+    "nodemon": "^2.0.7",
+    "npm-run-all": "^4.1.5",
+    "rimraf": "^3.0.2",
+    "supertest": "^6.1.3",
+    "ts-jest": "^26.5.5",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.1.3"
+  }
+}

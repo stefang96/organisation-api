@@ -1,1 +1,37 @@
-# organisation-api
+# DevCamper API
+
+> Backend API for Organisation application
+
+## Usage
+
+Add .env file
+
+```
+SERVER_PORT=<SERVER_PORT>
+POSTGRES_HOST=<POSTGRES_HOST>
+POSTGRES_PORT=<POSTGRES_PORT>
+POSTGRES_USER=<POSTGRES_USER>
+POSTGRES_PASSWORD=<POSTGRES_PASSWORD>
+POSTGRES_DATABASE=<POSTGRES_DATABASE>
+FRONTEND_URL=<FRONTEND_URL>
+TOKEN_EXP_TIME=24h
+PUBLIC_FOLDER=public
+TOKEN_SECRET_KEY=<TOKEN_SECRET_KEY>
+NODEMAILER_USER=<NODEMAILER_USER>
+NODEMAILER_PASSWORD=<NODEMAILER_PASSWORD>
+```
+
+## Install Dependencies
+
+```
+npm install
+```
+
+## Run App
+
+```
+# Run in dev mode
+npm run dev
+
+
+```
