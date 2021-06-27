@@ -5,8 +5,8 @@ export class Nodemailer {
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: "organisationetf@gmail.com",
-        pass: "Sarajevo2013",
+        user: process.env.NODEMAILER_USER,
+        pass: process.env.NODEMAILER_PASSWORD,
       },
     });
 
@@ -20,7 +20,7 @@ export class Nodemailer {
    */
   static async getEmail(to, subject, template) {
     const email = {
-      from: " 'Organisation App' <organisationetf@gmail.com>",
+      from: "Organisation App",
       to,
       subject,
       html: template,
