@@ -1,4 +1,4 @@
-# DevCamper API
+# Node.js API for organisation-fronted
 
 > Backend API for Organisation application
 
