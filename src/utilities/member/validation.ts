@@ -31,12 +31,13 @@ export class MemberValidation {
     return result.value;
   }
 
-  static async checkPassword(data: any) {
+  static checkPassword(data: any) {
     const { password, rePassword } = data;
 
-    if (password.toString().trim().equals(rePassword.toString().trim())) {
-      return true;
-    }
-    return false;
+    return (
+      password != null &&
+      rePassword != null &&
+      password.toString().trim() === rePassword.toString().trim()
+    );
   }
 }
