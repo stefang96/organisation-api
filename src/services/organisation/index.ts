@@ -2,7 +2,7 @@ import { Organisation } from "../../entities/organisation.model";
 import { OrganisationRepository } from "../../repositories/organisation";
 import { OrganisationValidation } from "../../utilities/organisation/validation";
 import { getManager, Brackets } from "typeorm";
-import jwt from "jsonwebtoken";
+import { verifyToken } from "../../utilities/auth/token";
 import moment = require("moment");
 import { MemberRepository } from "../../repositories/member";
 import { MembersRole } from "../../entities/member.model";
@@ -44,7 +44,7 @@ export class OrganisationService {
       .leftJoinAndSelect("organisation.contactPerson", "contactPerson");
 
     if (body.token) {
-      const loggedUser = jwt.decode(body.token);
+      const loggedUser = verifyToken(body.token);
       if (loggedUser.role === MembersRole.ADMIN) {
         query = query.andWhere("organisation.id = :organisationId", {
           organisationId: loggedUser.organisation.id,

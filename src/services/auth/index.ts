@@ -7,7 +7,7 @@ import * as bcrypt from "bcrypt";
 import { MemberHelper } from "../../utilities/member";
 import { MemberValidation } from "../../utilities/member/validation";
 import { OrganisationRepository } from "../../repositories/organisation";
-import jwt from "jsonwebtoken";
+import { verifyToken } from "../../utilities/auth/token";
 import { Nodemailer } from "../../utilities/email/nodemailer";
 import crypto from "crypto";
 import { PaymentsService } from "../payments";
@@ -44,7 +44,7 @@ export class AuthServices {
 
   static async changePassword(body: any, token) {
     const { password, rePassword } = body;
-    const loggedUser = jwt.decode(token);
+    const loggedUser = verifyToken(token);
 
     if (password.toString().trim() !== rePassword.toString().trim()) {
       throw new Error("Password does not match");

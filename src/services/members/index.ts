@@ -5,7 +5,7 @@ import { MemberHelper } from "../../utilities/member";
 import { MemberValidation } from "../../utilities/member/validation";
 import { getManager, Brackets } from "typeorm";
 import moment = require("moment");
-import jwt from "jsonwebtoken";
+import { verifyToken } from "../../utilities/auth/token";
 import * as bcrypt from "bcrypt";
 
 const saltRounds = 10;
@@ -75,8 +75,8 @@ export class MemberService {
       .createQueryBuilder("member")
       .leftJoinAndSelect("member.organisation", "organisation");
 
-    if (token !== "null") {
-      const loggedUser = jwt.decode(token);
+    if (token && token !== "null") {
+      const loggedUser = verifyToken(token);
       if (loggedUser.role !== MembersRole.SUPER_ADMIN) {
         query = query.andWhere("organisation.id = :organisationId", {
           organisationId: loggedUser.organisation.id,
@@ -127,7 +127,7 @@ export class MemberService {
 
   static async createMember(body: any) {
     const { firstName, lastName, email, phone, role } = body;
-    const loggedUser = jwt.decode(body.token);
+    const loggedUser = verifyToken(body.token);
 
     const newMember = new Member();
 
@@ -147,7 +147,6 @@ export class MemberService {
 
   static async updateMember(body: any, memberId: number) {
     const { firstName, lastName, email, phone, role } = body;
-    const loggedUser = jwt.decode(body.token);
     const member = await this.getMemberById(memberId);
 
     member.firstName = firstName;

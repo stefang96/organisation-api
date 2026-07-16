@@ -2,14 +2,14 @@ import { getManager, getRepository, getConnection } from "typeorm";
 import { Payments } from "../../entities/payments.model";
 import { PaymentsRepository } from "../../repositories/payments";
 import moment = require("moment");
-import jwt from "jsonwebtoken";
+import { verifyToken } from "../../utilities/auth/token";
 import { MemberService } from "../members";
 import { MemberRepository } from "../../repositories/member";
 import { MemberHelper } from "../../utilities/member";
 
 export class PaymentsService {
   static async createPayments(body: any) {
-    const loggedUser = jwt.decode(body.token);
+    const loggedUser = verifyToken(body.token);
     const payments = new Payments();
     payments.price = body.price;
     payments.createdAt = moment().unix();
@@ -31,7 +31,7 @@ export class PaymentsService {
   }
 
   static async getLatestPayment(token) {
-    const loggedUser = jwt.decode(token);
+    const loggedUser = verifyToken(token);
     const payments = (await PaymentsRepository.getLatestPayment(
       loggedUser.id
     )) as any;
@@ -59,7 +59,7 @@ export class PaymentsService {
       .leftJoinAndSelect("member.organisation", "organisation");
 
     if (body.token) {
-      const loggedUser = jwt.decode(body.token);
+      const loggedUser = verifyToken(body.token);
       if (loggedUser.role !== "super_admin") {
         query = query.andWhere("organisation.id = :organisationId", {
           organisationId: loggedUser.organisation.id,

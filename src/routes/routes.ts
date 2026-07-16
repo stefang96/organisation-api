@@ -23,7 +23,7 @@ export async function apiRoutes(app: express.Application) {
   app.use(
     expressJwt({
       secret: process.env.TOKEN_SECRET_KEY,
-      algorithms: ["sha1", "RS256", "HS256"],
+      algorithms: ["HS256"],
     }).unless({
       path: [
         "/static/",

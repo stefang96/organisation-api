@@ -1,7 +1,7 @@
 import { News } from "../../entities/news.model";
 import { NewsRepository } from "../../repositories/news";
 import moment = require("moment");
-import jwt from "jsonwebtoken";
+import { verifyToken } from "../../utilities/auth/token";
 import fs from "fs";
 import { getManager, Brackets } from "typeorm";
 import { getToken } from "../../middleware";
@@ -11,7 +11,7 @@ export class NewsService {
   private static port = process.env.SERVER_PORT;
 
   static async createNews(body: any, files: any) {
-    const loggedUser = jwt.decode(body.token);
+    const loggedUser = verifyToken(body.token);
 
     const { title, shortDescription, description } = body;
 
@@ -66,7 +66,7 @@ export class NewsService {
       .innerJoinAndSelect("member.organisation", "organisation");
 
     if (body.token) {
-      const loggedUser = jwt.decode(body.token);
+      const loggedUser = verifyToken(body.token);
       if (loggedUser.role !== "super_admin") {
         query = query.andWhere("organisation.id = :organisationId", {
           organisationId: loggedUser.organisation.id,
@@ -88,7 +88,7 @@ export class NewsService {
       .where("news.active = :active", { active: true });
 
     if (body.token) {
-      const loggedUser = jwt.decode(body.token);
+      const loggedUser = verifyToken(body.token);
       if (loggedUser.role !== "super_admin") {
         query = query.andWhere("organisation.id = :organisationId", {
           organisationId: loggedUser.organisation.id,
