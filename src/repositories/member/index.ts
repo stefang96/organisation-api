@@ -8,14 +8,15 @@ export class MemberRepository {
   }
 
   static async getMemberByEmail(email) {
+    // `password` is select:false on the entity, so it is re-added explicitly
+    // here because login needs it for bcrypt comparison.
     return await getManager()
       .getRepository(Member)
-      .findOne(
-        { email: email },
-        {
-          relations: ["organisation"],
-        }
-      );
+      .createQueryBuilder("member")
+      .addSelect("member.password")
+      .leftJoinAndSelect("member.organisation", "organisation")
+      .where("member.email = :email", { email })
+      .getOne();
   }
 
   static async getVerifyMember(query) {
