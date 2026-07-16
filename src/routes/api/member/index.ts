@@ -1,10 +1,6 @@
 import { Request, Response, Router } from "express";
-import { News } from "../../../entities/news.model";
-import { AuthServices } from "../../../services/auth";
-import { NewsService } from "../../../services/news";
 import { ResponseBuilder } from "../../../utilities/response";
 import { getToken } from "../../../middleware/index";
-import { brotliDecompressSync } from "zlib";
 import { MemberService } from "../../../services/members";
 import { checkMemberEmail } from "../../../middleware";
 

@@ -1,6 +1,5 @@
 import * as express from "express";
 import expressJwt from "express-jwt";
-import { OrganisationValidation } from "../utilities/organisation/validation";
 import { AuthRoutes } from "./api/auth";
 import { MemberRoutes } from "./api/member";
 import { NewsRoutes } from "./api/news";

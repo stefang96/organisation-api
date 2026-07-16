@@ -1,4 +1,4 @@
-import { getManager, getRepository, getConnection } from "typeorm";
+import { getManager, getConnection } from "typeorm";
 import { Payments } from "../../entities/payments.model";
 
 export class PaymentsRepository {

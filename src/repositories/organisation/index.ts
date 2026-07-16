@@ -1,4 +1,4 @@
-import { getManager, getRepository, getConnection } from "typeorm";
+import { getManager, getConnection } from "typeorm";
 import { Member } from "../../entities/member.model";
 import { Organisation } from "../../entities/organisation.model";
 
