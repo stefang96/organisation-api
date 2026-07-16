@@ -8,7 +8,8 @@ import { getManager, Brackets } from "typeorm";
 
 export class NewsService {
   private static public = process.env.PUBLIC_FOLDER;
-  private static port = process.env.SERVER_PORT;
+  private static apiBaseUrl =
+    process.env.API_BASE_URL || `http://localhost:${process.env.SERVER_PORT}`;
 
   /**
    * Persist an uploaded file for a news item and return its stored file name.
@@ -51,7 +52,7 @@ export class NewsService {
     if (files && files.file) {
       const fileName = await this.storeUploadedFile(createdNews.id, files);
       createdNews.fileName = fileName;
-      createdNews.filePath = `http://localhost:${this.port}/static/news_${createdNews.id}/${fileName}`;
+      createdNews.filePath = `${this.apiBaseUrl}/static/news_${createdNews.id}/${fileName}`;
     }
 
     return await NewsRepository.saveNews(createdNews);
@@ -157,7 +158,7 @@ export class NewsService {
     if (files && files.file) {
       const fileName = await this.storeUploadedFile(news.id, files);
       news.fileName = fileName;
-      news.filePath = `http://localhost:${this.port}/static/news_${news.id}/${fileName}`;
+      news.filePath = `${this.apiBaseUrl}/static/news_${news.id}/${fileName}`;
     }
 
     return await NewsRepository.saveNews(news);

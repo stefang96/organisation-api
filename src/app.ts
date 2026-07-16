@@ -17,10 +17,9 @@ app.use(fileUpload()); //enable multipart/form-data
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-//obavezno
 app.use(
   cors({
-    origin: "*",
+    origin: process.env.CORS_ORIGIN || "*",
   })
 );
 
