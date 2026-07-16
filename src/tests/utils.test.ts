@@ -1,45 +1,89 @@
-import { app } from "../app";
-import { createConnection } from "typeorm";
-import request from "supertest";
-import * as appConfig from "../config";
+import { MemberValidation } from "../utilities/member/validation";
+import { OrganisationValidation } from "../utilities/organisation/validation";
+import { getBearerToken } from "../utilities/auth/token";
 
-const signUpData = {
-  email: "admin@gmail.com",
-  firstName: "Stefan",
-  lastName: "Grujicic",
-  name: "Organisation 1",
-  address: "Address",
-  type: "Type organisation",
-  numberOfEmployees: 8,
-};
+// These are pure unit tests: no database or running server required, so they
+// are reproducible in CI. (The previous suite hit a live DB and asserted that
+// specific real credentials existed.)
 
-describe("/POST login", () => {
-  beforeAll(async (done) => {
-    await createConnection(appConfig.dbOptions)
-      .then(async (connection) => {
-        console.log("Connected to DB");
-      })
-      .catch((error) => console.log("TypeORM connection error: ", error));
+describe("MemberValidation.validationContactPerson", () => {
+  const valid = {
+    email: "jane@example.com",
+    firstName: "Jane",
+    lastName: "Doe",
+    phone: null,
+  };
 
-    done();
+  it("returns the validated value for valid input", async () => {
+    const result = await MemberValidation.validationContactPerson(valid);
+    expect(result.email).toBe("jane@example.com");
   });
 
-  it("test bad request login", async (done) => {
-    const res = await request(app)
-      .post("/api/auth/login")
-      .send({ email: signUpData.email, password: "1234" });
-
-    expect(res.status).toBe(400);
-    expect(res.body.status).toBe(false);
-    done();
+  it("throws on an invalid email", async () => {
+    await expect(
+      MemberValidation.validationContactPerson({ ...valid, email: "not-an-email" })
+    ).rejects.toThrow();
   });
-  it("test success login", async (done) => {
-    const res = await request(app)
-      .post("/api/auth/login")
-      .send({ email: "stefangrujicic996@gmail.com", password: "87ac2baa2728" });
 
-    expect(res.status).toBe(201);
-    expect(res.body.status).toBe(true);
-    done();
+  it("throws when a required field is missing", async () => {
+    const { firstName, ...withoutFirstName } = valid;
+    await expect(
+      MemberValidation.validationContactPerson(withoutFirstName)
+    ).rejects.toThrow();
+  });
+});
+
+describe("MemberValidation.checkPassword", () => {
+  it("is true when password and rePassword match (after trimming)", () => {
+    expect(
+      MemberValidation.checkPassword({ password: "secret ", rePassword: "secret" })
+    ).toBe(true);
+  });
+
+  it("is false when they differ", () => {
+    expect(
+      MemberValidation.checkPassword({ password: "a", rePassword: "b" })
+    ).toBe(false);
+  });
+
+  it("is false when rePassword is missing", () => {
+    expect(MemberValidation.checkPassword({ password: "a" })).toBe(false);
+  });
+});
+
+describe("OrganisationValidation.validateOragnisation", () => {
+  const valid = {
+    name: "Acme",
+    price: "100",
+    address: "Main St",
+    numberOfEmployees: null,
+  };
+
+  it("returns the validated value for valid input", async () => {
+    const result = await OrganisationValidation.validateOragnisation(valid);
+    expect(result.name).toBe("Acme");
+  });
+
+  it("throws when name is missing", async () => {
+    const { name, ...withoutName } = valid;
+    await expect(
+      OrganisationValidation.validateOragnisation(withoutName)
+    ).rejects.toThrow();
+  });
+});
+
+describe("getBearerToken", () => {
+  it("extracts the token from a Bearer header", () => {
+    expect(
+      getBearerToken({ headers: { authorization: "Bearer abc.def" } })
+    ).toBe("abc.def");
+  });
+
+  it("returns null when the header is absent", () => {
+    expect(getBearerToken({ headers: {} })).toBeNull();
+  });
+
+  it("returns null when the header carries no token", () => {
+    expect(getBearerToken({ headers: { authorization: "Bearer" } })).toBeNull();
   });
 });
