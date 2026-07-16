@@ -45,8 +45,10 @@ export async function apiRoutes(app: express.Application) {
 
   app.use((err, req, res, next) => {
     if (err.name === "UnauthorizedError") {
-      res.status(401).json({ message: "Invalid token." });
+      return res.status(401).json({ message: "Invalid token." });
     }
+    // Always respond, otherwise the request hangs until it times out.
+    return res.status(500).json({ message: "Internal server error." });
   });
 
   app.use("/api/auth", new AuthRoutes().getRouter());

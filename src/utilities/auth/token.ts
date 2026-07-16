@@ -16,3 +16,16 @@ export function verifyToken(token: string): any {
     algorithms: ALGORITHMS,
   });
 }
+
+/**
+ * Extract the bearer token from an `Authorization: Bearer <token>` header.
+ * Returns null when the header is missing or malformed, so callers do not
+ * crash on `undefined.toString()`.
+ */
+export function getBearerToken(req: any): string | null {
+  const header = req.headers && req.headers.authorization;
+  if (!header) {
+    return null;
+  }
+  return header.toString().split(" ")[1] || null;
+}
