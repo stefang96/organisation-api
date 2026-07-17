@@ -45,6 +45,26 @@ The server listens on `SERVER_PORT`. Uploaded files are served from
 npm test
 ```
 
+## Seeding test data
+
+Populate the database with a small, coherent dataset (three organisations,
+members across all roles, news items with cover images, and a payment):
+
+```bash
+npm run seed
+```
+
+> ⚠️ The seed **deletes all existing data** before inserting, so only run it
+> against a development/test database.
+
+All seeded members share the password **`Password123`**:
+
+| Role          | Email                                    |
+| ------------- | ---------------------------------------- |
+| `super_admin` | `superadmin@example.com`                 |
+| `admin`       | `admin@acme.com`, `admin@globex.com`     |
+| `member`      | `bob@acme.com`, `carol@acme.com`         |
+
 ## Project structure
 
 ```
@@ -59,6 +79,8 @@ src/
   entities/              Database models
   utilities/             Auth token helpers, validation, email, responses
   middleware/            Express middleware (auth header, email checks)
+  tools/seed.ts          Database seed script (npm run seed)
+  tests/                 Jest unit tests
 ```
 
 Requests flow **route → service → repository → entity**, and responses are
