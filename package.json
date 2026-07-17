@@ -11,6 +11,8 @@
     "dev:start": "npm-run-all build start",
     "dev": "nodemon --watch src -e ts --exec npm run dev:start",
     "start": "node .",
+    "seed": "npm-run-all build seed:run",
+    "seed:run": "node dist/tools/seed.js",
     "test": "jest ",
     "version": "echo $npm_package_version"
   },
