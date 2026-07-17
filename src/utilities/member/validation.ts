@@ -26,19 +26,18 @@ export class MemberValidation {
 
     if (result.error) {
       throw new Error(result.error.message);
-    } else if (result.errors) {
-      throw new Error(result.errors[0].message);
-    } else {
-      return result.value;
     }
+
+    return result.value;
   }
 
-  static async checkPassword(data: any) {
+  static checkPassword(data: any) {
     const { password, rePassword } = data;
 
-    if (password.toString().trim().equals(rePassword.toString().trim())) {
-      return true;
-    }
-    return false;
+    return (
+      password != null &&
+      rePassword != null &&
+      password.toString().trim() === rePassword.toString().trim()
+    );
   }
 }

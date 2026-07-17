@@ -2,6 +2,7 @@ import { Request, Response, Router } from "express";
 import { checkMemberEmail } from "../../../middleware";
 import { AuthServices } from "../../../services/auth";
 import { ResponseBuilder } from "../../../utilities/response";
+import { getBearerToken } from "../../../utilities/auth/token";
 
 export class AuthRoutes {
   private router: Router = Router();
@@ -56,7 +57,7 @@ export class AuthRoutes {
 
     this.router.put("/change-password", async (req: Request, res: Response) => {
       try {
-        const token = req.headers.authorization.toString().split(" ")[1];
+        const token = getBearerToken(req);
         const result = await AuthServices.changePassword(req.body, token);
 
         return new ResponseBuilder<any>()
@@ -76,13 +77,14 @@ export class AuthRoutes {
     });
     this.router.get("/verify", async (req: Request, res: Response) => {
       try {
-        const result = await AuthServices.verifyMember(req.query, res);
+        await AuthServices.verifyMember(req.query, res);
       } catch (e) {
         return new ResponseBuilder<any>()
-          .setData(e)
+          .setData(e.message)
           .setStatus(false)
           .setResponse(res)
-          .setResponseStatus(400);
+          .setResponseStatus(400)
+          .build();
       }
     });
 
@@ -103,7 +105,8 @@ export class AuthRoutes {
           .setData(e.message)
           .setStatus(false)
           .setResponse(res)
-          .setResponseStatus(400);
+          .setResponseStatus(400)
+          .build();
       }
     });
 

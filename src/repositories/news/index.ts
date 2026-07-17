@@ -1,6 +1,5 @@
 import { News } from "../../entities/news.model";
-import { getManager, getRepository, getConnection } from "typeorm";
-import { query } from "express";
+import { getManager, getConnection } from "typeorm";
 
 export class NewsRepository {
   static async saveNews(news: News) {

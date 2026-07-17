@@ -1,12 +1,9 @@
 import { Request, Response, Router } from "express";
-import { News } from "../../../entities/news.model";
-import { AuthServices } from "../../../services/auth";
-import { NewsService } from "../../../services/news";
 import { ResponseBuilder } from "../../../utilities/response";
 import { getToken } from "../../../middleware/index";
-import { brotliDecompressSync } from "zlib";
 import { MemberService } from "../../../services/members";
 import { checkMemberEmail } from "../../../middleware";
+import { getBearerToken } from "../../../utilities/auth/token";
 
 export class MemberRoutes {
   private router: Router = Router();
@@ -87,7 +84,7 @@ export class MemberRoutes {
         let total = null;
         let page = null;
         let limit = null;
-        const token = req.headers.authorization.toString().split(" ")[1];
+        const token = getBearerToken(req);
 
         if (req.body.pagination) {
           result = await MemberService.getAllMembers(req.body, token, true);

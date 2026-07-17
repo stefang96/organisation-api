@@ -1,6 +1,5 @@
 import * as express from "express";
 import expressJwt from "express-jwt";
-import { OrganisationValidation } from "../utilities/organisation/validation";
 import { AuthRoutes } from "./api/auth";
 import { MemberRoutes } from "./api/member";
 import { NewsRoutes } from "./api/news";
@@ -8,23 +7,12 @@ import { OrganisationRoutes } from "./api/organisation";
 import { PaymentsRoutes } from "./api/payments";
 
 export async function apiRoutes(app: express.Application) {
-  app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header(
-      "Access-Control-Allow-Methods",
-      "GET, POST, OPTIONS, PUT, PATCH, DELETE"
-    );
-    res.header(
-      "Access-Control-Allow-Headers",
-      "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-    );
-    next();
-  });
+  // CORS is configured once via the `cors` middleware in app.ts.
 
   app.use(
     expressJwt({
       secret: process.env.TOKEN_SECRET_KEY,
-      algorithms: ["sha1", "RS256", "HS256"],
+      algorithms: ["HS256"],
     }).unless({
       path: [
         "/static/",
@@ -46,8 +34,10 @@ export async function apiRoutes(app: express.Application) {
 
   app.use((err, req, res, next) => {
     if (err.name === "UnauthorizedError") {
-      res.status(401).json({ message: "Invalid token." });
+      return res.status(401).json({ message: "Invalid token." });
     }
+    // Always respond, otherwise the request hangs until it times out.
+    return res.status(500).json({ message: "Internal server error." });
   });
 
   app.use("/api/auth", new AuthRoutes().getRouter());

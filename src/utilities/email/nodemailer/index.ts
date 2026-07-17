@@ -49,18 +49,15 @@ export class Nodemailer {
 
   static async inviteUser(user) {
     const subject = "Welcome to Organisation";
-    const template =
-      ` <div   >
-    <a   href='http://localhost:5000/api/auth/verify?verifytoken=` +
+    const apiBaseUrl =
+      process.env.API_BASE_URL || `http://localhost:${process.env.SERVER_PORT}`;
+    const verifyUrl =
+      `${apiBaseUrl}/api/auth/verify?verifytoken=` +
       encodeURIComponent(user.verifytoken) +
       `&email=` +
-      encodeURIComponent(user.email) +
-      `' >  <span > http://localhost:5000/api/auth/verify?verifytoken=` +
-      encodeURIComponent(user.verifytoken) +
-      `&email=` +
-      encodeURIComponent(user.email) +
-      `</span>
-    </a>
+      encodeURIComponent(user.email);
+    const template = ` <div>
+    <a href='${verifyUrl}'><span>${verifyUrl}</span></a>
  </div>`;
     await this.sendEmail(user.email, subject, template);
   }

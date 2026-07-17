@@ -6,14 +6,13 @@
   "main": "dist/index.js",
   "scripts": {
     "clean": "rimraf dist/*",
-    "lint": "tslint -c tslint.json -p tsconfig.json --fix",
     "tsc": "tsc",
     "build": "npm-run-all clean tsc",
     "dev:start": "npm-run-all build start",
     "dev": "nodemon --watch src -e ts --exec npm run dev:start",
     "start": "node .",
-    "initdb": "ts-node tools/initdb",
-    "docs": "jsdoc -c jsdoc.json",
+    "seed": "npm-run-all build seed:run",
+    "seed:run": "node dist/tools/seed.js",
     "test": "jest ",
     "version": "echo $npm_package_version"
   },
@@ -38,7 +37,6 @@
     "joi": "^17.3.0",
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.29.1",
-    "multer": "^1.4.2",
     "nodemailer": "^6.4.17",
     "pg": "^8.5.1",
     "typeorm": "^0.2.30"

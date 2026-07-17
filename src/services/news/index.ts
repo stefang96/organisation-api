@@ -1,17 +1,41 @@
 import { News } from "../../entities/news.model";
 import { NewsRepository } from "../../repositories/news";
 import moment = require("moment");
-import jwt from "jsonwebtoken";
+import { verifyToken } from "../../utilities/auth/token";
 import fs from "fs";
+import path from "path";
 import { getManager, Brackets } from "typeorm";
-import { getToken } from "../../middleware";
 
 export class NewsService {
   private static public = process.env.PUBLIC_FOLDER;
-  private static port = process.env.SERVER_PORT;
+  private static apiBaseUrl =
+    process.env.API_BASE_URL || `http://localhost:${process.env.SERVER_PORT}`;
+
+  /**
+   * Persist an uploaded file for a news item and return its stored file name.
+   *
+   * The client-supplied name is reduced to its base name to prevent path
+   * traversal, and the target directory is created synchronously so failures
+   * surface to the caller's try/catch instead of crashing the process from an
+   * async callback.
+   */
+  private static async storeUploadedFile(
+    newsId: number,
+    files: any
+  ): Promise<string> {
+    // express-fileupload yields an array when several files share the field.
+    const fileNews = Array.isArray(files.file) ? files.file[0] : files.file;
+    const safeName = path.basename(fileNews.name);
+
+    const dir = `${this.public}/news_${newsId}`;
+    fs.mkdirSync(dir, { recursive: true });
+    await fileNews.mv(`${dir}/${safeName}`);
+
+    return safeName;
+  }
 
   static async createNews(body: any, files: any) {
-    const loggedUser = jwt.decode(body.token);
+    const loggedUser = verifyToken(body.token);
 
     const { title, shortDescription, description } = body;
 
@@ -25,30 +49,10 @@ export class NewsService {
 
     const createdNews = await NewsRepository.saveNews(news);
 
-    const filePath = `${this.public}/news_${createdNews.id}`;
-
-    fs.mkdir(filePath, (err) => {
-      if (err) {
-        throw new Error("Error directory created");
-      }
-      console.log("Directory created successfully!");
-    });
-
-    if (files) {
-      let fileNews = files.file;
-      if (files.file.length > 1) {
-        fileNews = files.file[0];
-      }
-
-      fileNews.mv(`${filePath}/${fileNews.name}`, (res, err) => {
-        if (err) {
-          console.log(err);
-          throw new Error("Error occured");
-        }
-      });
-
-      createdNews.fileName = fileNews.name;
-      createdNews.filePath = `http://localhost:${this.port}/static/news_${createdNews.id}/${fileNews.name}`;
+    if (files && files.file) {
+      const fileName = await this.storeUploadedFile(createdNews.id, files);
+      createdNews.fileName = fileName;
+      createdNews.filePath = `${this.apiBaseUrl}/static/news_${createdNews.id}/${fileName}`;
     }
 
     return await NewsRepository.saveNews(createdNews);
@@ -66,7 +70,7 @@ export class NewsService {
       .innerJoinAndSelect("member.organisation", "organisation");
 
     if (body.token) {
-      const loggedUser = jwt.decode(body.token);
+      const loggedUser = verifyToken(body.token);
       if (loggedUser.role !== "super_admin") {
         query = query.andWhere("organisation.id = :organisationId", {
           organisationId: loggedUser.organisation.id,
@@ -88,7 +92,7 @@ export class NewsService {
       .where("news.active = :active", { active: true });
 
     if (body.token) {
-      const loggedUser = jwt.decode(body.token);
+      const loggedUser = verifyToken(body.token);
       if (loggedUser.role !== "super_admin") {
         query = query.andWhere("organisation.id = :organisationId", {
           organisationId: loggedUser.organisation.id,
@@ -151,23 +155,10 @@ export class NewsService {
     await NewsRepository.updateNews(body, newsId);
     const news = await this.getNewsById(newsId);
 
-    if (files) {
-      let fileNews = files.file;
-      if (files.file.length > 1) {
-        fileNews = files.file[0];
-      }
-
-      const filePath = `${this.public}/news_${news.id}`;
-
-      fileNews.mv(`${filePath}/${fileNews.name}`, (res, err) => {
-        if (err) {
-          console.log(err);
-          throw new Error("Error occured");
-        }
-      });
-
-      news.fileName = fileNews.name;
-      news.filePath = `http://localhost:${this.port}/static/news_${news.id}/${fileNews.name}`;
+    if (files && files.file) {
+      const fileName = await this.storeUploadedFile(news.id, files);
+      news.fileName = fileName;
+      news.filePath = `${this.apiBaseUrl}/static/news_${news.id}/${fileName}`;
     }
 
     return await NewsRepository.saveNews(news);

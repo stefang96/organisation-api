@@ -27,7 +27,7 @@ export class Member extends Content {
   @Column({ name: "Email", nullable: false })
   email: string;
 
-  @Column({ name: "Password", nullable: true })
+  @Column({ name: "Password", nullable: true, select: false })
   password: string;
 
   @Column({ name: "Phone", nullable: true })
@@ -44,10 +44,10 @@ export class Member extends Content {
   @Column({ name: "Verified", default: false })
   verified: boolean;
 
-  @Column({ name: "VerifyToken", nullable: true })
+  @Column({ name: "VerifyToken", nullable: true, select: false })
   verifytoken: string;
 
-  @Column({ name: "SetPasswordToken", nullable: true })
+  @Column({ name: "SetPasswordToken", nullable: true, select: false })
   setpasswordtoken: string;
 
   @ManyToOne(() => Organisation, (organisation) => organisation.members, {

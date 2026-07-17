@@ -2,6 +2,7 @@ import { Request, Response, Router } from "express";
 import { ResponseBuilder } from "../../../utilities/response";
 import { getToken } from "../../../middleware/index";
 import { PaymentsService } from "../../../services/payments";
+import { getBearerToken } from "../../../utilities/auth/token";
 
 export class PaymentsRoutes {
   private router: Router = Router();
@@ -52,7 +53,7 @@ export class PaymentsRoutes {
 
     this.router.get("/payment/latest", async (req: Request, res: Response) => {
       try {
-        const token = req.headers.authorization.toString().split(" ")[1];
+        const token = getBearerToken(req);
         const result = await PaymentsService.getLatestPayment(token);
 
         return new ResponseBuilder<any>()

@@ -7,7 +7,7 @@ import * as bcrypt from "bcrypt";
 import { MemberHelper } from "../../utilities/member";
 import { MemberValidation } from "../../utilities/member/validation";
 import { OrganisationRepository } from "../../repositories/organisation";
-import jwt from "jsonwebtoken";
+import { verifyToken } from "../../utilities/auth/token";
 import { Nodemailer } from "../../utilities/email/nodemailer";
 import crypto from "crypto";
 import { PaymentsService } from "../payments";
@@ -30,21 +30,31 @@ export class AuthServices {
       lastName: body.lastName,
       phone: body.phone,
     };
-    const createdContactPerson = await MemberService.createContactPerson(
-      contactPerson,
-      createdOrganisation.id
-    );
 
-    createdOrganisation.contactPerson = createdContactPerson;
+    // If contact-person creation or the follow-up save fails, roll back the
+    // organisation we just created so signup does not leave an orphan behind.
+    // (A DB transaction would be cleaner but requires threading an
+    // EntityManager through the service/repository layers.)
+    try {
+      const createdContactPerson = await MemberService.createContactPerson(
+        contactPerson,
+        createdOrganisation.id
+      );
 
-    await OrganisationRepository.saveOrganisation(createdOrganisation);
+      createdOrganisation.contactPerson = createdContactPerson;
+
+      await OrganisationRepository.saveOrganisation(createdOrganisation);
+    } catch (error) {
+      await OrganisationRepository.deleteOrganisation(createdOrganisation.id);
+      throw error;
+    }
 
     return "Successfully signup! <br/> Please check your email.";
   }
 
   static async changePassword(body: any, token) {
     const { password, rePassword } = body;
-    const loggedUser = jwt.decode(token);
+    const loggedUser = verifyToken(token);
 
     if (password.toString().trim() !== rePassword.toString().trim()) {
       throw new Error("Password does not match");
@@ -87,7 +97,7 @@ export class AuthServices {
     const member = await MemberRepository.getVerifyMember(query);
 
     if (!member) {
-      return;
+      throw new Error("Invalid or expired verification link.");
     }
     member.createdAt = moment().unix();
     member.verified = true;
@@ -115,14 +125,12 @@ export class AuthServices {
 
     const member = await MemberRepository.getSetPasswordMember(params);
 
-    // const checkPassword = await MemberValidation.checkPassword(data);
-
-    //// if (!checkPassword) {
-    // throw new Error("Password and confirm password does not match!");
-    //  }
-
     if (!member) {
       throw new Error("Member does not exist!");
+    }
+
+    if (!MemberValidation.checkPassword(data)) {
+      throw new Error("Password and confirm password does not match!");
     }
 
     member.setpasswordtoken = null;
