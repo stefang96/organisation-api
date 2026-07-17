@@ -1,5 +1,7 @@
 import "reflect-metadata";
 import dotenv from "dotenv";
+import fs from "fs";
+import zlib from "zlib";
 import { createConnection, Connection, ConnectionOptions } from "typeorm";
 import * as bcrypt from "bcrypt";
 import { Organisation } from "../entities/organisation.model";
@@ -14,6 +16,70 @@ dotenv.config();
 const PASSWORD = "Password123";
 
 const now = () => Math.floor(Date.now() / 1000);
+
+const PUBLIC_FOLDER = process.env.PUBLIC_FOLDER || "public";
+const API_BASE_URL =
+  process.env.API_BASE_URL || `http://localhost:${process.env.SERVER_PORT}`;
+
+// Standard CRC-32 (as required by the PNG spec). Implemented locally so this
+// tool does not depend on zlib.crc32 (only present on newer Node versions).
+function crc32(buf: Buffer): number {
+  let crc = 0xffffffff;
+  for (let i = 0; i < buf.length; i++) {
+    crc ^= buf[i];
+    for (let j = 0; j < 8; j++) {
+      crc = crc & 1 ? (crc >>> 1) ^ 0xedb88320 : crc >>> 1;
+    }
+  }
+  return (crc ^ 0xffffffff) >>> 0;
+}
+
+// Build a solid-colour PNG buffer, so seeded news items have a real cover
+// image instead of a broken-image placeholder in the UI.
+function solidPng(width: number, height: number, rgb: [number, number, number]) {
+  const chunk = (type: string, data: Buffer) => {
+    const typeBuf = Buffer.from(type, "ascii");
+    const lenBuf = Buffer.alloc(4);
+    lenBuf.writeUInt32BE(data.length, 0);
+    const crcBuf = Buffer.alloc(4);
+    crcBuf.writeUInt32BE(crc32(Buffer.concat([typeBuf, data])), 0);
+    return Buffer.concat([lenBuf, typeBuf, data, crcBuf]);
+  };
+
+  const ihdr = Buffer.alloc(13);
+  ihdr.writeUInt32BE(width, 0);
+  ihdr.writeUInt32BE(height, 4);
+  ihdr[8] = 8; // bit depth
+  ihdr[9] = 2; // colour type: RGB
+
+  const rowLen = width * 3;
+  const raw = Buffer.alloc((rowLen + 1) * height);
+  for (let y = 0; y < height; y++) {
+    const rowStart = y * (rowLen + 1); // leading filter byte stays 0
+    for (let x = 0; x < width; x++) {
+      const p = rowStart + 1 + x * 3;
+      raw[p] = rgb[0];
+      raw[p + 1] = rgb[1];
+      raw[p + 2] = rgb[2];
+    }
+  }
+
+  return Buffer.concat([
+    Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]),
+    chunk("IHDR", ihdr),
+    chunk("IDAT", zlib.deflateSync(raw)),
+    chunk("IEND", Buffer.alloc(0)),
+  ]);
+}
+
+// Write a cover image for a news item and return its stored file name.
+function writeCoverImage(newsId: number, rgb: [number, number, number]) {
+  const dir = `${PUBLIC_FOLDER}/news_${newsId}`;
+  fs.mkdirSync(dir, { recursive: true });
+  const fileName = "cover.png";
+  fs.writeFileSync(`${dir}/${fileName}`, solidPng(600, 400, rgb));
+  return fileName;
+}
 
 // Entities are referenced as classes here (rather than the dist glob used by
 // the app) so this script runs directly with ts-node.
@@ -129,24 +195,33 @@ async function seed() {
   await orgRepo.save(globex);
 
   // --- News ----------------------------------------------------------------
-  const newsItems = [
+  const newsItems: Array<{
+    title: string;
+    shortDescription: string;
+    description: string;
+    member: Member;
+    color: [number, number, number];
+  }> = [
     {
       title: "Acme launches new product line",
       shortDescription: "A short teaser about the launch.",
       description: "Acme Inc announced a new product line today...",
       member: acmeAdmin,
+      color: [37, 99, 235], // blue
     },
     {
       title: "Bob joins the Acme team",
       shortDescription: "Welcome Bob!",
       description: "We are happy to welcome Bob Brown to Acme.",
       member: acmeMember1,
+      color: [22, 163, 74], // green
     },
     {
       title: "Globex opens a new office",
       shortDescription: "Expansion news.",
       description: "Globex LLC is expanding to a new location.",
       member: globexAdmin,
+      color: [217, 70, 70], // red
     },
   ];
   for (const item of newsItems) {
@@ -157,7 +232,12 @@ async function seed() {
     n.member = item.member;
     n.active = true;
     n.createdAt = now();
-    await newsRepo.save(n);
+    const saved = await newsRepo.save(n);
+
+    const fileName = writeCoverImage(saved.id, item.color);
+    saved.fileName = fileName;
+    saved.filePath = `${API_BASE_URL}/static/news_${saved.id}/${fileName}`;
+    await newsRepo.save(saved);
   }
 
   // --- Payments ------------------------------------------------------------
